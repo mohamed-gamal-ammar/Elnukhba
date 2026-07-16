@@ -1,0 +1,6 @@
+{
+  "name": "متجر الأجهزة الإلكترونية والمنزلية",
+  "description": "منصة تجارة إلكترونية عربية متكاملة لبيع الأجهزة المنزلية والإلكترونيات مع لوحة تحكم متطورة للمبيعات والمخزون.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
