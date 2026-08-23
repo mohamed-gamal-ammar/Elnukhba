@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight, ArrowLeft, Percent, Clock, ChevronLeft } from 'lucide-react';
-import { Product, SystemSettings } from '../types.js';
+import { Product, SystemSettings, Banner } from '../types.js';
 
 interface HeroSliderProps {
   settings: SystemSettings;
@@ -10,38 +10,61 @@ interface HeroSliderProps {
 
 export default function HeroSlider({ settings, flashSaleProduct, onNavigate }: HeroSliderProps) {
   const [activeSlide, setActiveSlide] = useState(0);
+  const [banners, setBanners] = useState<Banner[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const slides = [
+  useEffect(() => {
+    fetch('/api/banners')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setBanners(data);
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load active banners:', err);
+        setLoading(false);
+      });
+  }, []);
+
+  const staticBanners = [
     {
+      id: 'static-1',
       title: settings.bannerTitle,
       subtitle: settings.bannerSubtitle,
-      image: settings.bannerImage,
+      desktopImage: settings.bannerImage,
+      mobileImage: settings.bannerImage,
       badge: 'عروض حصرية لفترة محدودة',
-      linkTab: 'products',
-      linkArg: { isOffer: true },
+      btnLink: 'products',
       btnText: 'تصفح العروض الآن'
     },
     {
+      id: 'static-2',
       title: 'جدد بيتك مع أرقى ثلاجات وشاشات OLED',
       subtitle: 'خصومات تصل إلى 15٪ مع ضمان رسمي معتمد وشحن سريع لكافة المحافظات مجاناً!',
-      image: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=1200',
+      desktopImage: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=1200',
+      mobileImage: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=800',
       badge: 'أقوى الماركات العالمية (LG, Samsung)',
-      linkTab: 'products',
-      linkArg: { category: 'تلفزيونات وشاشات' },
+      btnLink: 'products',
       btnText: 'تصفح الشاشات الكبرى'
     },
     {
+      id: 'static-3',
       title: 'مساعد التسوق الذكي بالذكاء الاصطناعي',
       subtitle: 'استشر خبير مبيعاتنا الآلي المدعوم من نموذج Gemini لاختيار الأجهزة الكهربائية التي تلائم بيتك بالتمام!',
-      image: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200',
+      desktopImage: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=1200',
+      mobileImage: 'https://images.unsplash.com/photo-1546410531-bb4caa6b424d?auto=format&fit=crop&q=80&w=800',
       badge: 'ميزة ذكية فريدة',
-      linkTab: 'home',
-      linkArg: 'assistant',
+      btnLink: 'assistant',
       btnText: 'تحدث مع مساعدنا الذكي'
     }
   ];
 
+  const slides = banners.length > 0 ? banners : staticBanners;
+
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = setInterval(() => {
       setActiveSlide(prev => (prev + 1) % slides.length);
     }, 6000);
@@ -56,29 +79,50 @@ export default function HeroSlider({ settings, flashSaleProduct, onNavigate }: H
     setActiveSlide(prev => (prev + 1) % slides.length);
   };
 
+  const handleSlideClick = (slide: any) => {
+    const link = slide.btnLink || slide.linkTab || 'products';
+    const arg = slide.linkArg;
+    
+    if (link === 'assistant' || arg === 'assistant') {
+      const btn = document.getElementById('floating-chat-trigger');
+      if (btn) btn.click();
+    } else {
+      if (typeof link === 'string' && link === 'products' && arg) {
+        onNavigate('products', arg);
+      } else {
+        onNavigate(link, arg);
+      }
+    }
+  };
+
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-6 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6" id="hero-banner-section">
       {/* Dynamic Slide Carousel (takes 2 cols on lg) */}
       <div className="lg:col-span-2 relative h-[320px] md:h-[420px] rounded-2xl overflow-hidden shadow-lg group">
-        {slides.map((slide, index) => (
+        {slides.map((slide: any, index) => (
           <div
-            key={index}
+            key={slide.id || index}
             className={`absolute inset-0 w-full h-full transition-opacity duration-700 ease-in-out ${index === activeSlide ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'}`}
           >
             {/* Slide Image Backdrop */}
             <div className="absolute inset-0 bg-gradient-to-l from-slate-950/90 via-slate-900/60 to-transparent z-10" />
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="absolute inset-0 w-full h-full object-cover scale-102 group-hover:scale-105 transition-transform duration-10000"
-            />
+            <picture className="absolute inset-0 w-full h-full">
+              <source media="(max-width: 768px)" srcSet={slide.mobileImage || slide.image} />
+              <img
+                src={slide.desktopImage || slide.image}
+                alt={slide.title}
+                className="absolute inset-0 w-full h-full object-cover scale-102 group-hover:scale-105 transition-transform duration-10000"
+              />
+            </picture>
 
             {/* Slide text details */}
             <div className="absolute inset-0 z-20 flex flex-col justify-center items-start p-8 md:p-12 text-right">
-              <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black rounded-full mb-4 shadow-md animate-bounce">
-                <Percent className="w-3.5 h-3.5" />
-                {slide.badge}
-              </span>
+              {slide.badge && (
+                <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-500 text-slate-950 text-xs font-black rounded-full mb-4 shadow-md animate-bounce">
+                  <Percent className="w-3.5 h-3.5" />
+                  {slide.badge}
+                </span>
+              )}
               <h1 className="text-2xl md:text-4xl font-extrabold text-white leading-tight mb-4 max-w-lg drop-shadow-md">
                 {slide.title}
               </h1>
@@ -86,18 +130,10 @@ export default function HeroSlider({ settings, flashSaleProduct, onNavigate }: H
                 {slide.subtitle}
               </p>
               <button
-                onClick={() => {
-                  if (slide.linkArg === 'assistant') {
-                    // focus chat assistant
-                    const btn = document.getElementById('floating-chat-trigger');
-                    if (btn) btn.click();
-                  } else {
-                    onNavigate(slide.linkTab, slide.linkArg);
-                  }
-                }}
+                onClick={() => handleSlideClick(slide)}
                 className="inline-flex items-center gap-2 py-3 px-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-sm rounded-lg shadow-lg hover:shadow-amber-500/25 transition-all duration-300 cursor-pointer"
               >
-                {slide.btnText}
+                {slide.btnText || 'تصفح العروض'}
                 <ChevronLeft className="w-4 h-4 text-slate-950 stroke-[3]" />
               </button>
             </div>
@@ -105,32 +141,38 @@ export default function HeroSlider({ settings, flashSaleProduct, onNavigate }: H
         ))}
 
         {/* Carousel Arrow controllers */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-slate-900/40 text-white hover:bg-amber-500 hover:text-slate-950 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none"
-          aria-label="السابق"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-slate-900/40 text-white hover:bg-amber-500 hover:text-slate-950 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none"
-          aria-label="التالي"
-        >
-          <ArrowRight className="w-5 h-5" />
-        </button>
+        {slides.length > 1 && (
+          <>
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-slate-900/40 text-white hover:bg-amber-500 hover:text-slate-950 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none cursor-pointer"
+              aria-label="السابق"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2 rounded-full bg-slate-900/40 text-white hover:bg-amber-500 hover:text-slate-950 opacity-0 group-hover:opacity-100 transition-all duration-300 focus:outline-none cursor-pointer"
+              aria-label="التالي"
+            >
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
 
         {/* Indicator dots */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setActiveSlide(i)}
-              className={`w-2.5 h-2.5 rounded-full border border-white/50 transition-all ${i === activeSlide ? 'bg-amber-500 w-6 border-amber-500' : 'bg-white/30'}`}
-              aria-label={`شريحة ${i + 1}`}
-            />
-          ))}
-        </div>
+        {slides.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5">
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setActiveSlide(i)}
+                className={`w-2.5 h-2.5 rounded-full border border-white/50 transition-all ${i === activeSlide ? 'bg-amber-500 w-6 border-amber-500' : 'bg-white/30'}`}
+                aria-label={`شريحة ${i + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Side Promotion Card / Dynamic Flash Sale (takes 1 col on lg) */}

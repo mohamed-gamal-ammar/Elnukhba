@@ -1,12 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>متجر الأجهزة الإلكترونية والمنزلية - منصة مبيعات متكاملة</title>
+    <script>
+      (function() {
+        try {
+          var theme = localStorage.getItem('app_theme') || 'dark';
+          if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+        } catch(e) {}
+      })();
+    </script>
   </head>
-  <body>
-    <div id="root"></div>
+  <body class="bg-slate-50 text-slate-900 dark:bg-[#0B0F19] dark:bg-slate-950 dark:text-slate-100 min-h-screen antialiased selection:bg-amber-500 selection:text-slate-950 transition-colors duration-200">
+    <div id="root" class="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,9 +1,625 @@
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Cairo", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+}
+
+:root {
+  color-scheme: light;
+  accent-color: #f59e0b !important;
+}
+
+html.dark {
+  color-scheme: dark;
+  accent-color: #f59e0b !important;
+}
+
+/* ==========================================================================
+   GLOBAL INPUTS & CONTROLS THEME STANDARDIZATION (DARK / AMBER DESIGN SYSTEM)
+   ========================================================================== */
+
+/* 1. Global Accent Color & Removal of Default Browser Blue */
+*, *::before, *::after {
+  accent-color: #f59e0b !important;
+}
+
+::selection {
+  background-color: rgba(245, 158, 11, 0.35) !important;
+  color: #0f172a !important;
+}
+
+::-moz-selection {
+  background-color: rgba(245, 158, 11, 0.35) !important;
+  color: #0f172a !important;
+}
+
+html.dark ::selection,
+.dark ::selection {
+  background-color: rgba(245, 158, 11, 0.4) !important;
+  color: #ffffff !important;
+}
+
+html.dark ::-moz-selection,
+.dark ::-moz-selection {
+  background-color: rgba(245, 158, 11, 0.4) !important;
+  color: #ffffff !important;
+}
+
+input, textarea, select {
+  caret-color: #f59e0b !important;
+}
+
+/* Chrome/Safari Autocomplete autofill amber styling - Light Mode */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #0f172a !important;
+  -webkit-box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  box-shadow: 0 0 0px 1000px #ffffff inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #f59e0b !important;
+}
+
+/* Chrome/Safari Autocomplete autofill amber styling - Dark Mode */
+html.dark input:-webkit-autofill,
+html.dark input:-webkit-autofill:hover,
+html.dark input:-webkit-autofill:focus,
+html.dark textarea:-webkit-autofill,
+html.dark textarea:-webkit-autofill:hover,
+html.dark textarea:-webkit-autofill:focus,
+html.dark select:-webkit-autofill,
+html.dark select:-webkit-autofill:hover,
+html.dark select:-webkit-autofill:focus,
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #0f172a inset !important;
+  box-shadow: 0 0 0px 1000px #0f172a inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #f59e0b !important;
+}
+
+:focus-visible {
+  outline: none !important;
+}
+
+/* 2. Text, Number, Password, Search, Email, Tel, Url Inputs & Textareas */
+html.dark input[type="text"],
+html.dark input[type="email"],
+html.dark input[type="password"],
+html.dark input[type="search"],
+html.dark input[type="tel"],
+html.dark input[type="url"],
+html.dark input[type="number"],
+html.dark textarea,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="search"],
+.dark input[type="tel"],
+.dark input[type="url"],
+.dark input[type="number"],
+.dark textarea {
+  background-color: #0f172a !important; /* bg-slate-900 */
+  border: 1px solid rgba(245, 158, 11, 0.2) !important; /* border-amber-500/20 */
+  color: #ffffff !important; /* text-white */
+}
+
+/* Hover State */
+html.dark input[type="text"]:hover:not(:disabled),
+html.dark input[type="email"]:hover:not(:disabled),
+html.dark input[type="password"]:hover:not(:disabled),
+html.dark input[type="search"]:hover:not(:disabled),
+html.dark input[type="tel"]:hover:not(:disabled),
+html.dark input[type="url"]:hover:not(:disabled),
+html.dark input[type="number"]:hover:not(:disabled),
+html.dark textarea:hover:not(:disabled),
+.dark input[type="text"]:hover:not(:disabled),
+.dark input[type="email"]:hover:not(:disabled),
+.dark input[type="password"]:hover:not(:disabled),
+.dark input[type="search"]:hover:not(:disabled),
+.dark input[type="tel"]:hover:not(:disabled),
+.dark input[type="url"]:hover:not(:disabled),
+.dark input[type="number"]:hover:not(:disabled),
+.dark textarea:hover:not(:disabled) {
+  border-color: rgba(245, 158, 11, 0.4) !important; /* hover:border-amber-500/40 */
+}
+
+/* Focus State */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+input[type="text"]:focus-visible,
+input[type="email"]:focus-visible,
+input[type="password"]:focus-visible,
+input[type="search"]:focus-visible,
+input[type="tel"]:focus-visible,
+input[type="url"]:focus-visible,
+input[type="number"]:focus-visible,
+textarea:focus-visible {
+  outline: none !important;
+  border-color: #f59e0b !important; /* border-amber-500 */
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important; /* ring-2 ring-amber-500/30 */
+}
+
+/* Placeholder Styling */
+input::placeholder,
+textarea::placeholder {
+  color: #64748b !important; /* text-slate-500 */
+}
+
+/* Disabled State */
+input:disabled,
+textarea:disabled,
+select:disabled,
+button:disabled,
+[role="switch"][aria-disabled="true"],
+[role="switch"]:disabled {
+  opacity: 0.5 !important; /* opacity-50 */
+  cursor: not-allowed !important; /* cursor-not-allowed */
+}
+
+/* Error States */
+input.border-red-500,
+input.border-rose-500,
+textarea.border-red-500,
+textarea.border-rose-500,
+input[aria-invalid="true"],
+textarea[aria-invalid="true"] {
+  border-color: #ef4444 !important; /* border-red-500 */
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3) !important; /* ring-red-500/30 */
+}
+
+/* Success States */
+input.border-green-500,
+input.border-emerald-500,
+textarea.border-green-500,
+textarea.border-emerald-500,
+input[data-success="true"],
+textarea[data-success="true"] {
+  border-color: #22c55e !important; /* border-green-500 */
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3) !important;
+}
+
+/* 3. Checkboxes & Radio Buttons */
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: #f59e0b !important; /* Amber instead of blue */
+  cursor: pointer;
+}
+
+html.dark input[type="checkbox"],
+html.dark input[type="radio"],
+.dark input[type="checkbox"],
+.dark input[type="radio"] {
+  background-color: #0f172a !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+input[type="checkbox"]:focus,
+input[type="radio"]:focus,
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* 4. Date, Time & Datetime Pickers */
+html.dark input[type="date"],
+html.dark input[type="time"],
+html.dark input[type="datetime-local"],
+html.dark input[type="month"],
+html.dark input[type="week"],
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="datetime-local"],
+.dark input[type="month"],
+.dark input[type="week"] {
+  color-scheme: dark !important;
+  background-color: #0f172a !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  color: #ffffff !important;
+}
+
+html.dark input[type="date"]:hover,
+html.dark input[type="time"]:hover,
+html.dark input[type="datetime-local"]:hover,
+.dark input[type="date"]:hover,
+.dark input[type="time"]:hover,
+.dark input[type="datetime-local"]:hover {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* Calendar & clock picker icon amber color */
+html.dark input[type="date"]::-webkit-calendar-picker-indicator,
+html.dark input[type="time"]::-webkit-calendar-picker-indicator,
+html.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.75) sepia(100%) saturate(300%) hue-rotate(350deg);
+  cursor: pointer;
+}
+
+/* 5. Range Sliders */
+input[type="range"] {
+  accent-color: #f59e0b !important;
+  background: #1e293b;
+  border-radius: 9999px;
+  height: 6px;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  background: #f59e0b !important;
+  border: 2px solid #0f172a !important;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+input[type="range"]::-moz-range-thumb {
+  background: #f59e0b !important;
+  border: 2px solid #0f172a !important;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.4);
+}
+
+input[type="range"]:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* 6. Color Pickers */
+html.dark input[type="color"],
+.dark input[type="color"] {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-radius: 0.5rem;
+  padding: 2px;
+  cursor: pointer;
+}
+
+html.dark input[type="color"]:hover,
+.dark input[type="color"]:hover {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+html.dark input[type="color"]:focus,
+.dark input[type="color"]:focus {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 0.375rem;
+}
+
+input[type="color"]::-moz-color-swatch {
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 0.375rem;
+}
+
+/* 7. File Upload Controls */
+html.dark input[type="file"],
+.dark input[type="file"] {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-radius: 0.75rem;
+  color: #ffffff !important;
+}
+
+html.dark input[type="file"]:hover,
+.dark input[type="file"]:hover {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+input[type="file"]::file-selector-button {
+  background-color: #0f172a !important;
+  color: #f59e0b !important;
+  border: 1px solid rgba(245, 158, 11, 0.3) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.375rem 0.75rem !important;
+  margin-inline-end: 0.75rem !important;
+  font-size: 0.75rem !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  border-color: #f59e0b !important;
+  color: #ffffff !important;
+}
+
+/* 8. Switches */
+[role="switch"][aria-checked="true"] {
+  background-color: #f59e0b !important; /* Amber instead of Blue */
+}
+
+[role="switch"]:focus,
+[role="switch"]:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Global native dropdown dark mode support and contrast fix */
+html.dark select,
+.dark select,
+select.dark,
+select[class*="bg-slate-900"],
+select[class*="bg-slate-950"],
+select[class*="bg-slate-800"] {
+  color-scheme: dark !important;
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+html.dark select option,
+.dark select option,
+select.dark option,
+select[class*="bg-slate-900"] option,
+select[class*="bg-slate-950"] option,
+select[class*="bg-slate-800"] option {
+  background-color: #0f172a !important; /* bg-slate-900 */
+  color: #ffffff !important; /* text-white */
+}
+
+/* Light mode defaults for select options */
+select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+html.dark select option,
+html.dark select option:checked,
+html.dark select option:hover,
+html.dark select option:focus,
+.dark select option,
+.dark select option:checked,
+.dark select option:hover,
+.dark select option:focus {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+}
+
+html.dark select option:checked,
+.dark select option:checked {
+  color: #fbbf24 !important; /* amber-400 */
+}
+
+/* Global Dark/Amber Dropdown & Menu Standardization */
+select:focus,
+select:focus-visible {
+  outline: none !important;
+  border-color: #f59e0b !important; /* amber-500 */
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25) !important;
+}
+
+/* Light Mode: Radix, Headless UI, Popover, Menu Overrides */
+[data-radix-popper-content-wrapper] [role="menu"],
+[data-radix-popper-content-wrapper] [role="listbox"],
+[data-radix-dropdown-menu-content],
+[data-radix-select-content],
+[data-radix-popover-content],
+[role="menu"],
+[role="listbox"],
+.dropdown-menu,
+.select-menu,
+.popover-menu,
+.command-menu {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0; /* border-slate-200 */
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+}
+
+/* Dark Mode: Radix, Headless UI, Popover, Menu Overrides */
+html.dark [data-radix-popper-content-wrapper] [role="menu"],
+html.dark [data-radix-popper-content-wrapper] [role="listbox"],
+html.dark [data-radix-dropdown-menu-content],
+html.dark [data-radix-select-content],
+html.dark [data-radix-popover-content],
+html.dark [role="menu"],
+html.dark [role="listbox"],
+html.dark .dropdown-menu,
+html.dark .select-menu,
+html.dark .popover-menu,
+html.dark .command-menu,
+.dark [data-radix-popper-content-wrapper] [role="menu"],
+.dark [data-radix-popper-content-wrapper] [role="listbox"],
+.dark [data-radix-dropdown-menu-content],
+.dark [data-radix-select-content],
+.dark [data-radix-popover-content],
+.dark [role="menu"],
+.dark [role="listbox"],
+.dark .dropdown-menu,
+.dark .select-menu,
+.dark .popover-menu,
+.dark .command-menu {
+  background-color: #0f172a !important;
+  border: 1px solid rgba(245, 158, 11, 0.2) !important;
+  border-radius: 0.75rem !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5), 0 0 15px 0 rgba(245, 158, 11, 0.05) !important;
+  color: #ffffff !important;
+}
+
+/* Light Mode: highlighted, focused, and hover item background */
+[data-radix-select-item][data-highlighted],
+[data-radix-dropdown-menu-item][data-highlighted],
+[role="option"][data-highlighted],
+[role="menuitem"][data-highlighted],
+[cmdk-item][data-selected="true"],
+[cmdk-item]:hover,
+[role="option"]:hover:not([aria-disabled="true"]):not([disabled]),
+[role="menuitem"]:hover:not([aria-disabled="true"]):not([disabled]) {
+  background-color: #fef3c7; /* amber-100 */
+  color: #78350f; /* amber-900 */
+  outline: none;
+}
+
+/* Dark Mode: highlighted, focused, and hover item background */
+html.dark [data-radix-select-item][data-highlighted],
+html.dark [data-radix-dropdown-menu-item][data-highlighted],
+html.dark [role="option"][data-highlighted],
+html.dark [role="menuitem"][data-highlighted],
+html.dark [cmdk-item][data-selected="true"],
+html.dark [cmdk-item]:hover,
+html.dark [role="option"]:hover:not([aria-disabled="true"]):not([disabled]),
+html.dark [role="menuitem"]:hover:not([aria-disabled="true"]):not([disabled]),
+.dark [data-radix-select-item][data-highlighted],
+.dark [data-radix-dropdown-menu-item][data-highlighted],
+.dark [role="option"][data-highlighted],
+.dark [role="menuitem"][data-highlighted],
+.dark [cmdk-item][data-selected="true"],
+.dark [cmdk-item]:hover,
+.dark [role="option"]:hover:not([aria-disabled="true"]):not([disabled]),
+.dark [role="menuitem"]:hover:not([aria-disabled="true"]):not([disabled]) {
+  background-color: rgba(245, 158, 11, 0.1) !important; /* bg-amber-500/10 */
+  color: #ffffff !important;
+  outline: none !important;
+}
+
+/* Light Mode: selected item background */
+[data-radix-select-item][data-state="checked"],
+[data-radix-dropdown-menu-item][data-state="checked"],
+[role="option"][aria-selected="true"],
+[role="option"][data-selected="true"],
+[role="menuitem"][aria-selected="true"] {
+  background-color: #fde68a; /* amber-200 */
+  color: #78350f; /* amber-900 */
+}
+
+/* Dark Mode: selected item background */
+html.dark [data-radix-select-item][data-state="checked"],
+html.dark [data-radix-dropdown-menu-item][data-state="checked"],
+html.dark [role="option"][aria-selected="true"],
+html.dark [role="option"][data-selected="true"],
+html.dark [role="menuitem"][aria-selected="true"],
+.dark [data-radix-select-item][data-state="checked"],
+.dark [data-radix-dropdown-menu-item][data-state="checked"],
+.dark [role="option"][aria-selected="true"],
+.dark [role="option"][data-selected="true"],
+.dark [role="menuitem"][aria-selected="true"] {
+  background-color: rgba(245, 158, 11, 0.2) !important; /* bg-amber-500/20 */
+  color: #ffffff !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+}
+
+/* Light Mode: active / pressed item background */
+[data-radix-select-item]:active,
+[data-radix-dropdown-menu-item]:active,
+[role="option"]:active,
+[role="menuitem"]:active,
+[cmdk-item]:active {
+  background-color: #fcd34d; /* amber-300 */
+}
+
+/* Dark Mode: active / pressed item background */
+html.dark [data-radix-select-item]:active,
+html.dark [data-radix-dropdown-menu-item]:active,
+html.dark [role="option"]:active,
+html.dark [role="menuitem"]:active,
+html.dark [cmdk-item]:active,
+.dark [data-radix-select-item]:active,
+.dark [data-radix-dropdown-menu-item]:active,
+.dark [role="option"]:active,
+.dark [role="menuitem"]:active,
+.dark [cmdk-item]:active {
+  background-color: rgba(245, 158, 11, 0.25) !important; /* bg-amber-500/25 */
+}
+
+/* Global checkmark and icon color inside dropdowns */
+[data-radix-select-item-indicator],
+[role="option"] [data-check-icon],
+[role="menuitem"] [data-check-icon],
+[role="option"] svg,
+[role="menuitem"] svg {
+  color: #fbbf24 !important; /* text-amber-400 */
+}
+
+/* Dropdown listbox scrollbar */
+[role="listbox"]::-webkit-scrollbar,
+.custom-dropdown-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+[role="listbox"]::-webkit-scrollbar-track,
+.custom-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+html.dark [role="listbox"]::-webkit-scrollbar-track,
+html.dark .custom-dropdown-scrollbar::-webkit-scrollbar-track,
+.dark [role="listbox"]::-webkit-scrollbar-track,
+.dark .custom-dropdown-scrollbar::-webkit-scrollbar-track {
+  background: #090d16;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb,
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+html.dark [role="listbox"]::-webkit-scrollbar-thumb,
+html.dark .custom-dropdown-scrollbar::-webkit-scrollbar-thumb,
+.dark [role="listbox"]::-webkit-scrollbar-thumb,
+.dark .custom-dropdown-scrollbar::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+
+[role="listbox"]::-webkit-scrollbar-thumb:hover,
+.custom-dropdown-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+body {
+  background-color: #F8FAFC;
+  color: #0F172A;
+  font-family: var(--font-sans);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+html.dark body {
+  background-color: #0B0F19;
+  color: #F8FAFC;
 }
 
 /* Custom scrollbar styles */
@@ -13,12 +629,20 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #020617; /* slate-950 */
+  background: #F1F5F9;
+}
+
+html.dark ::-webkit-scrollbar-track {
+  background: #0B0F19; /* dark canvas */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155; /* slate-700 */
+  background: #94A3B8; /* slate-400 */
   border-radius: 4px;
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: #334155; /* slate-700 */
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -48,3 +672,4 @@
     margin: 0 !important;
   }
 }
+
