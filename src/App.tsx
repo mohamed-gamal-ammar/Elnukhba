@@ -2,7 +2,7 @@ import React, { useState, useEffect, lazy, Suspense, useMemo, useRef } from 'rea
 import {
   ShoppingCart, Heart, Trash2, ArrowRight, Star, Plus, Minus,
   Tag, Check, HelpCircle, PhoneCall, Info, MapPin, Truck, ShieldCheck, Sparkles, ChevronLeft,
-  RotateCcw, X, Clock, Users, LogOut, Bell, Lock, AlertCircle, ShieldAlert
+  RotateCcw, X, Clock, Users, LogOut, Bell, Lock, AlertCircle, ShieldAlert, Share2, ExternalLink
 } from 'lucide-react';
 import { api, getFriendlyErrorMessage } from './lib/api.js';
 import { useCustomerAuth } from './context/CustomerAuthContext.js';
@@ -16,6 +16,7 @@ import ProductCard from './components/ProductCard.js';
 import ProductFilters from './components/ProductFilters.js';
 import CampaignBanner, { getMatchingCampaign } from './components/CampaignBanner.js';
 import { CustomSelect } from './components/CustomSelect.js';
+import SocialIcon from './components/SocialIcon.js';
 
 // Lazy load non-critical above-the-fold storefront components
 const CheckoutForm = lazy(() => import('./components/CheckoutForm.js'));
@@ -1132,7 +1133,11 @@ export default function App() {
   const handleValidateCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     setCouponError('');
-    if (!couponCodeInput.trim()) return;
+    const trimmedCode = couponCodeInput.trim();
+    if (!trimmedCode) {
+      setCouponError('يرجى إدخال رمز الكوبون أولاً');
+      return;
+    }
 
     const cartTotal = cart.reduce((sum, item) => {
       const price = item.selectedVariant ? item.selectedVariant.price : (item.product.discountPrice || item.product.price);
@@ -1140,26 +1145,50 @@ export default function App() {
     }, 0);
 
     try {
-      const res = await api.validateCoupon(couponCodeInput, cartTotal);
-      setActiveCoupon(res);
-      let discount = 0;
-      if (res.discountType === 'percentage') {
-        discount = (cartTotal * res.value) / 100;
-        if (res.maxDiscountAmount && discount > res.maxDiscountAmount) {
-          discount = res.maxDiscountAmount;
+      const res = await api.validateCoupon(
+        trimmedCode,
+        cartTotal,
+        customer?.email,
+        customer?.phone,
+        customer?.id
+      );
+
+      if (res && (res as any).valid !== false) {
+        setActiveCoupon(res);
+        let discount = 0;
+        const rawVal = res.value !== undefined ? res.value : (res.discountValue !== undefined ? res.discountValue : 0);
+        if (res.discountType === 'percentage') {
+          discount = (cartTotal * rawVal) / 100;
+          if (res.maxDiscountAmount && discount > res.maxDiscountAmount) {
+            discount = res.maxDiscountAmount;
+          }
+          discount = Math.round(discount);
+        } else if (res.discountType === 'fixed') {
+          discount = Math.min(rawVal, cartTotal);
+        } else if (res.discountType === 'free_shipping') {
+          discount = settings?.shippingFlatRate || 0;
         }
-        discount = Math.round(discount);
-      } else if (res.discountType === 'fixed') {
-        discount = Math.min(res.value, cartTotal);
-      } else if (res.discountType === 'free_shipping') {
-        discount = settings?.shippingFlatRate || 0;
+        setCouponDiscount(discount);
+        setCouponError('');
+      } else {
+        const errorMsg = (res as any)?.message || (res as any)?.error || 'الكوبون المدخل غير صالح أو تم استخدامه مسبقاً';
+        setCouponError(errorMsg);
+        setCouponDiscount(0);
+        setActiveCoupon(null);
       }
-      setCouponDiscount(discount);
     } catch (err: any) {
-      setCouponError(getFriendlyErrorMessage(err, 'الكوبون المدخل غير صالح أو انتهت صلاحيته'));
+      const errMsg = err?.data?.message || err?.data?.error || getFriendlyErrorMessage(err, 'الكوبون المدخل غير صالح أو انتهت صلاحيته');
+      setCouponError(errMsg);
       setCouponDiscount(0);
       setActiveCoupon(null);
     }
+  };
+
+  const handleRemoveCoupon = () => {
+    setActiveCoupon(null);
+    setCouponDiscount(0);
+    setCouponError('');
+    setCouponCodeInput('');
   };
 
   // Auto-recalculate active coupon discount whenever cart, activeCoupon, or settings change
@@ -1186,14 +1215,15 @@ export default function App() {
 
     setCouponError('');
     let discount = 0;
+    const rawVal = activeCoupon.value !== undefined ? activeCoupon.value : (activeCoupon.discountValue !== undefined ? activeCoupon.discountValue : 0);
     if (activeCoupon.discountType === 'percentage') {
-      discount = (cartTotal * activeCoupon.value) / 100;
+      discount = (cartTotal * rawVal) / 100;
       if (activeCoupon.maxDiscountAmount && discount > activeCoupon.maxDiscountAmount) {
         discount = activeCoupon.maxDiscountAmount;
       }
       discount = Math.round(discount);
     } else if (activeCoupon.discountType === 'fixed') {
-      discount = Math.min(activeCoupon.value, cartTotal);
+      discount = Math.min(rawVal, cartTotal);
     } else if (activeCoupon.discountType === 'free_shipping') {
       discount = settings?.shippingFlatRate || 0;
     }
@@ -2823,12 +2853,38 @@ export default function App() {
                         placeholder="أدخل رمز الكوبون"
                         value={couponCodeInput}
                         onChange={(e) => setCouponCodeInput(e.target.value)}
-                        className="flex-1 text-xs border border-slate-200 dark:border-amber-500/20 bg-white dark:bg-slate-900 rounded-lg px-3 py-2 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 uppercase"
+                        disabled={!!activeCoupon}
+                        className="flex-1 text-xs border border-slate-200 dark:border-amber-500/20 bg-white dark:bg-slate-900 rounded-lg px-3 py-2 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/30 uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                       />
-                      <button type="submit" className="py-2 px-4 bg-slate-900 dark:bg-amber-500 hover:bg-slate-800 dark:hover:bg-amber-400 text-white dark:text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer">تطبيق</button>
+                      {activeCoupon ? (
+                        <button
+                          type="button"
+                          onClick={handleRemoveCoupon}
+                          className="py-2 px-4 bg-rose-50 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 font-bold text-xs rounded-lg transition-colors cursor-pointer border border-rose-200 dark:border-rose-800/40"
+                        >
+                          إلغاء
+                        </button>
+                      ) : (
+                        <button
+                          type="submit"
+                          className="py-2 px-4 bg-slate-900 dark:bg-amber-500 hover:bg-slate-800 dark:hover:bg-amber-400 text-white dark:text-slate-950 font-bold text-xs rounded-lg transition-colors cursor-pointer"
+                        >
+                          تطبيق
+                        </button>
+                      )}
                     </div>
-                    {couponError && <p className="text-[10px] text-rose-500 font-bold mt-1.5">{couponError}</p>}
-                    {activeCoupon && <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-black mt-1.5 flex items-center gap-1">✓ تم التفعيل! وفّرت {couponDiscount} ج.م</p>}
+                    {couponError && (
+                      <div className="mt-2 p-2 rounded-lg bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40">
+                        <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold leading-relaxed">{couponError}</p>
+                      </div>
+                    )}
+                    {activeCoupon && (
+                      <div className="mt-2 p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/40 flex items-center justify-between">
+                        <p className="text-[11px] text-emerald-700 dark:text-emerald-300 font-bold flex items-center gap-1">
+                          ✓ تم تفعيل الكود ({activeCoupon.code}) - وفرت {couponDiscount} ج.م
+                        </p>
+                      </div>
+                    )}
                   </form>
 
                   {/* Pricing summaries */}
@@ -3192,6 +3248,52 @@ export default function App() {
                     <strong className="text-xs text-slate-900 dark:text-white mt-1 block">{settings.contactAddress}</strong>
                   </div>
                 </div>
+
+                {/* Dynamic Social Media Channels Section */}
+                {(() => {
+                  const activeSocial = Array.isArray(settings.socialLinks)
+                    ? settings.socialLinks.filter(l => l.enabled !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
+                    : [
+                        ...(settings.socialFacebook ? [{ id: 'facebook', name: 'Facebook', url: settings.socialFacebook, icon: 'facebook', enabled: true, order: 1, openInNewTab: true }] : []),
+                        ...(settings.socialInstagram ? [{ id: 'instagram', name: 'Instagram', url: settings.socialInstagram, icon: 'instagram', enabled: true, order: 2, openInNewTab: true }] : []),
+                        ...(settings.socialTwitter ? [{ id: 'twitter', name: 'Twitter', url: settings.socialTwitter, icon: 'twitter', enabled: true, order: 3, openInNewTab: true }] : [])
+                      ];
+
+                  if (activeSocial.length === 0) return null;
+
+                  return (
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 space-y-3" id="contact-social-section">
+                      <div className="flex items-center gap-2">
+                        <Share2 className="w-5 h-5 text-amber-500 shrink-0" />
+                        <div>
+                          <h4 className="text-xs font-black text-slate-900 dark:text-white">قنوات التواصل والمتابعة</h4>
+                          <p className="text-[11px] text-slate-500 dark:text-slate-400">تابعنا على شبكات التواصل الاجتماعي للحصول على أحدث العروض والمسابقات</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                        {activeSocial.map(link => (
+                          <a
+                            key={link.id}
+                            href={link.url}
+                            target={link.openInNewTab !== false ? '_blank' : undefined}
+                            rel={link.openInNewTab !== false ? 'noopener noreferrer' : undefined}
+                            className="flex items-center justify-between p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
+                            id={`contact-social-link-${link.id}`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-500 flex items-center justify-center shrink-0 group-hover:bg-amber-500 group-hover:text-slate-950 transition-colors">
+                                <SocialIcon icon={link.icon} className="w-4 h-4" />
+                              </div>
+                              <span className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{link.name}</span>
+                            </div>
+                            <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-500 shrink-0 transition-colors" />
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>

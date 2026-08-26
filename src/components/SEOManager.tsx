@@ -57,11 +57,15 @@ export default function SEOManager({ currentTab, selectedProduct, settings }: SE
             'streetAddress': contactAddress,
             'addressCountry': 'EG'
           },
-          'sameAs': [
-            settings?.socialFacebook,
-            settings?.socialInstagram,
-            settings?.socialTwitter
-          ].filter(Boolean),
+          'sameAs': (
+            Array.isArray(settings?.socialLinks) && settings.socialLinks.length > 0
+              ? settings.socialLinks.filter(l => l.enabled !== false && l.url).map(l => l.url)
+              : [
+                  settings?.socialFacebook,
+                  settings?.socialInstagram,
+                  settings?.socialTwitter
+                ]
+          ).filter(Boolean),
           'priceRange': '$$$'
         });
         break;

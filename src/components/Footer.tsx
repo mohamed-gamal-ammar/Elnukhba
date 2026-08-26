@@ -1,6 +1,7 @@
 import React from 'react';
-import { ShieldCheck, Truck, RefreshCw, BadgePercent, Facebook, Instagram, Twitter, PhoneCall, Mail, MapPin } from 'lucide-react';
+import { ShieldCheck, Truck, RefreshCw, BadgePercent, PhoneCall, Mail, MapPin } from 'lucide-react';
 import { SystemSettings } from '../types.js';
+import SocialIcon from './SocialIcon.js';
 
 interface FooterProps {
   settings: SystemSettings;
@@ -8,6 +9,14 @@ interface FooterProps {
 }
 
 export default function Footer({ settings, onNavigate }: FooterProps) {
+  // Extract active social links
+  const activeSocialLinks = Array.isArray(settings.socialLinks)
+    ? settings.socialLinks.filter(link => link.enabled !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
+    : [
+        ...(settings.socialFacebook ? [{ id: 'facebook', name: 'Facebook', url: settings.socialFacebook, icon: 'facebook', enabled: true, order: 1, openInNewTab: true }] : []),
+        ...(settings.socialInstagram ? [{ id: 'instagram', name: 'Instagram', url: settings.socialInstagram, icon: 'instagram', enabled: true, order: 2, openInNewTab: true }] : []),
+        ...(settings.socialTwitter ? [{ id: 'twitter', name: 'Twitter', url: settings.socialTwitter, icon: 'twitter', enabled: true, order: 3, openInNewTab: true }] : [])
+      ];
   return (
     <footer className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white pt-12 pb-6 border-t border-slate-200 dark:border-slate-800 transition-colors" id="site-footer">
       {/* Visual core values icons row */}
@@ -58,16 +67,21 @@ export default function Footer({ settings, onNavigate }: FooterProps) {
           <p className="text-xs text-slate-600 dark:text-gray-400 leading-relaxed">
             المنصة العربية الأولى المتخصصة في بيع وتوزيع الأجهزة المنزلية الكبرى والصغرى وأرقى الإلكترونيات الاستهلاكية. نجمع لك الجودة، الضمان الطويل والأسعار التنافسية.
           </p>
-          <div className="flex items-center gap-3 mt-2">
-            <a href={settings.socialFacebook} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-amber-500 hover:text-slate-950 transition-all">
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a href={settings.socialInstagram} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-amber-500 hover:text-slate-950 transition-all">
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a href={settings.socialTwitter} target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-amber-500 hover:text-slate-950 transition-all">
-              <Twitter className="w-4 h-4" />
-            </a>
+          <div className="flex items-center flex-wrap gap-2.5 mt-2" id="footer-social-links">
+            {activeSocialLinks.map((link) => (
+              <a
+                key={link.id}
+                href={link.url}
+                target={link.openInNewTab !== false ? '_blank' : undefined}
+                rel={link.openInNewTab !== false ? 'noopener noreferrer' : undefined}
+                className="p-2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-gray-300 hover:bg-amber-500 hover:text-slate-950 transition-all hover:scale-105"
+                title={link.name}
+                aria-label={link.name}
+                id={`footer-social-${link.id}`}
+              >
+                <SocialIcon icon={link.icon} className="w-4 h-4" />
+              </a>
+            ))}
           </div>
         </div>
 

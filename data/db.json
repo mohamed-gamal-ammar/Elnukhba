@@ -18,7 +18,7 @@
       "rating": 4.7,
       "reviewsCount": 3,
       "sku": "LG-OLED-65C3",
-      "stock": 561,
+      "stock": 553,
       "tags": [
         "تلفزيون",
         "سمارت",
@@ -69,7 +69,7 @@
           "size": "55 بوصة",
           "warranty": "3 سنوات",
           "price": 34999,
-          "stock": 38,
+          "stock": 36,
           "sku": "LG-OLED-55C3",
           "barcode": "8806091234567",
           "lowStockThreshold": 5,
@@ -80,7 +80,7 @@
           "size": "65 بوصة",
           "warranty": "3 سنوات",
           "price": 44999,
-          "stock": 523,
+          "stock": 517,
           "sku": "LG-OLED-65C3",
           "barcode": "8806091234581",
           "lowStockThreshold": 5
@@ -149,7 +149,7 @@
       "rating": 4.6,
       "reviewsCount": 2,
       "sku": "SAM-REF-RT45",
-      "stock": 8,
+      "stock": 3,
       "tags": [
         "ثلاجة",
         "سامسونج",
@@ -196,7 +196,7 @@
           "capacity": "450 لتر",
           "warranty": "10 سنوات",
           "price": 26999,
-          "stock": 5,
+          "stock": 0,
           "sku": "SAM-REF-RT45-SL",
           "barcode": "8806091244009",
           "lowStockThreshold": 5
@@ -250,7 +250,7 @@
       "rating": 4.5,
       "reviewsCount": 2,
       "sku": "TOSH-WASH-11KG",
-      "stock": 22,
+      "stock": 21,
       "tags": [
         "غسالة",
         "توشيبا",
@@ -296,7 +296,7 @@
           "capacity": "11 كيلو",
           "warranty": "5 سنوات",
           "price": 16800,
-          "stock": 12,
+          "stock": 11,
           "sku": "TOSH-WASH-11KG",
           "barcode": "4904530012345",
           "lowStockThreshold": 5
@@ -537,7 +537,7 @@
       "rating": 4.3,
       "reviewsCount": 1,
       "sku": "SHRP-MIC-25L-GR",
-      "stock": 12,
+      "stock": 9,
       "tags": [
         "مايكروويف",
         "شارب",
@@ -583,7 +583,7 @@
           "capacity": "25 لتر",
           "warranty": "سنتان",
           "price": 6200,
-          "stock": 12,
+          "stock": 9,
           "sku": "SHRP-MIC-25L-GR",
           "barcode": "4974019201234",
           "lowStockThreshold": 5
@@ -620,7 +620,7 @@
       "reviewsCount": 0,
       "reviews": [],
       "sku": "TEST-SKU-VALID-1786464744025",
-      "stock": 15,
+      "stock": 32,
       "variants": [],
       "specifications": [],
       "features": [],
@@ -669,6 +669,597 @@
     }
   ],
   "orders": [
+    {
+      "id": "ORD-2487",
+      "invoiceNumber": "INV-2026-2487",
+      "date": "2026-08-26T07:22:06.011Z",
+      "customer": {
+        "name": "عميل أ محتال",
+        "phone": "01079396322",
+        "email": "customer_a_1787728923138@test.com",
+        "address": "مدينة نصر",
+        "governorate": "القاهرة",
+        "city": "مدينة نصر"
+      },
+      "items": [
+        {
+          "productId": "prod-sharp-micro-25",
+          "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+          "variantSku": "SHRP-MIC-25L-GR",
+          "quantity": 1,
+          "price": 6200
+        }
+      ],
+      "subtotal": 6200,
+      "discountAmount": 0,
+      "shippingCost": 0,
+      "taxAmount": 868,
+      "total": 7068,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:22:06.011Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-9520",
+      "invoiceNumber": "INV-2026-9520",
+      "date": "2026-08-26T07:22:04.213Z",
+      "customer": {
+        "name": "عميل أ",
+        "phone": "01079396322",
+        "email": "customer_a_1787728923138@test.com",
+        "address": "مدينة نصر",
+        "governorate": "القاهرة",
+        "city": "مدينة نصر"
+      },
+      "items": [
+        {
+          "productId": "prod-sharp-micro-25",
+          "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+          "variantSku": "SHRP-MIC-25L-GR",
+          "quantity": 1,
+          "price": 6200
+        }
+      ],
+      "couponCode": "EID2026",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "subtotal": 6200,
+      "discountAmount": 930,
+      "shippingCost": 0,
+      "taxAmount": 868,
+      "total": 6138,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:22:04.213Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-4741",
+      "invoiceNumber": "INV-2026-4741",
+      "date": "2026-08-26T07:17:46.406Z",
+      "customer": {
+        "name": "كريم سامي",
+        "phone": "01033935748",
+        "email": "user_vip_1787728665561@test.com",
+        "address": "شارع الهرم",
+        "governorate": "الجيزة",
+        "city": "الهرم"
+      },
+      "items": [
+        {
+          "productId": "prod-sharp-micro-25",
+          "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+          "variantSku": "SHRP-MIC-25L-GR",
+          "quantity": 1,
+          "price": 6200
+        }
+      ],
+      "couponCode": "EID2026",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "subtotal": 6200,
+      "discountAmount": 930,
+      "shippingCost": 0,
+      "taxAmount": 868,
+      "total": 6138,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:17:46.406Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-7685",
+      "invoiceNumber": "INV-2026-7685",
+      "date": "2026-08-26T07:17:04.652Z",
+      "customer": {
+        "name": "عميل تجريبي",
+        "phone": "01038172375",
+        "email": "user_1787728624103@test.com",
+        "address": "شارع النصر",
+        "governorate": "القاهرة",
+        "city": "المعادي"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantSku": "LG-OLED-65C3",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "EID2026",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "subtotal": 44999,
+      "discountAmount": 6749.85,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 44549.01,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:17:04.652Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-6407",
+      "invoiceNumber": "INV-2026-6407",
+      "date": "2026-08-26T07:16:40.527Z",
+      "customer": {
+        "name": "أحمد محمود",
+        "phone": "01012345678",
+        "email": "user1@test.com",
+        "address": "شارع النصر",
+        "governorate": "القاهرة",
+        "city": "المعادي"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantSku": "LG-OLED-65C3",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "EID2026",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "subtotal": 44999,
+      "discountAmount": 6749.85,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 44549.01,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:16:40.527Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-9274",
+      "invoiceNumber": "INV-2026-9274",
+      "date": "2026-08-26T07:16:13.268Z",
+      "customer": {
+        "name": "عميل تجريبي",
+        "phone": "01011112222",
+        "email": "test@example.com",
+        "address": "شارع التجربة",
+        "governorate": "القاهرة",
+        "city": "مدينة نصر"
+      },
+      "items": [
+        {
+          "productId": "prod-toshiba-wash-11",
+          "productTitle": "غسالة ملابس توشيبا فوق أوتوماتيك سعة 11 كيلو جرام",
+          "variantSku": "TOSH-WASH-11KG",
+          "quantity": 1,
+          "price": 16800
+        }
+      ],
+      "couponCode": "EID2026",
+      "discountType": "percentage",
+      "discountValue": 15,
+      "subtotal": 16800,
+      "discountAmount": 2520,
+      "shippingCost": 0,
+      "taxAmount": 2352,
+      "total": 16632,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-26T07:16:13.268Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-7774",
+      "invoiceNumber": "INV-2026-7774",
+      "date": "2026-08-25T10:03:58.939Z",
+      "customer": {
+        "name": "عميل تجربة الخصم الثابت",
+        "phone": "01122334455",
+        "governorate": "الإسكندرية",
+        "city": "سموحة",
+        "address": "شارع فوزي معاذ"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantId": "var-lg-65",
+          "variantSku": "LG-OLED-65C3",
+          "variantInfo": "65 بوصة",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "FIXED_500_MT8HZBFF",
+      "discountType": "fixed",
+      "discountValue": 500,
+      "subtotal": 44999,
+      "discountAmount": 500,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 50798.86,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:03:58.939Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-3671",
+      "invoiceNumber": "INV-2026-3671",
+      "date": "2026-08-25T10:03:52.232Z",
+      "customer": {
+        "name": "عميل الحماية والتأمين",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع النصر"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantId": "var-lg-65",
+          "variantSku": "LG-OLED-65C3",
+          "variantInfo": "65 بوصة",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "PERC_10_MT8HZBFF",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 44999,
+      "discountAmount": 4499.9,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 46798.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:03:52.232Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-7084",
+      "invoiceNumber": "INV-2026-7084",
+      "date": "2026-08-25T10:03:22.418Z",
+      "customer": {
+        "name": "عميل تجربة الخصم الثابت",
+        "phone": "01122334455",
+        "governorate": "الإسكندرية",
+        "city": "سموحة",
+        "address": "شارع فوزي معاذ"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantId": "var-lg-65",
+          "variantSku": "LG-OLED-65C3",
+          "variantInfo": "65 بوصة",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "FIXED_500_MT8HYJ5C",
+      "discountType": "fixed",
+      "discountValue": 500,
+      "subtotal": 44999,
+      "discountAmount": 500,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 50798.86,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:03:22.418Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-2899",
+      "invoiceNumber": "INV-2026-2899",
+      "date": "2026-08-25T10:03:15.579Z",
+      "customer": {
+        "name": "عميل الحماية والتأمين",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع النصر"
+      },
+      "items": [
+        {
+          "productId": "prod-lg-oled-65",
+          "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+          "variantId": "var-lg-65",
+          "variantSku": "LG-OLED-65C3",
+          "variantInfo": "65 بوصة",
+          "quantity": 1,
+          "price": 44999
+        }
+      ],
+      "couponCode": "PERC_10_MT8HYJ5C",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 44999,
+      "discountAmount": 4499.9,
+      "shippingCost": 0,
+      "taxAmount": 6299.86,
+      "total": 46798.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:03:15.579Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-8448",
+      "invoiceNumber": "INV-2026-8448",
+      "date": "2026-08-25T10:01:19.949Z",
+      "customer": {
+        "name": "عميل تجريبي",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع النصر"
+      },
+      "items": [
+        {
+          "productId": "prod-samsung-ref-450",
+          "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+          "variantId": "var-sam-silver",
+          "variantSku": "SAM-REF-RT45-SL",
+          "variantInfo": "فضي / 450 لتر",
+          "quantity": 1,
+          "price": 26999
+        }
+      ],
+      "couponCode": "WELCOME10",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 26999,
+      "discountAmount": 2699.9,
+      "shippingCost": 0,
+      "taxAmount": 3779.86,
+      "total": 28078.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:01:19.949Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-3168",
+      "invoiceNumber": "INV-2026-3168",
+      "date": "2026-08-25T10:01:13.124Z",
+      "customer": {
+        "name": "عميل الحماية والتأمين",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع النصر"
+      },
+      "items": [
+        {
+          "productId": "prod-samsung-ref-450",
+          "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+          "variantId": "var-sam-silver",
+          "variantSku": "SAM-REF-RT45-SL",
+          "variantInfo": "فضي / 450 لتر",
+          "quantity": 1,
+          "price": 26999
+        }
+      ],
+      "couponCode": "TEST_PERC_10",
+      "discountType": "percentage",
+      "discountValue": 90,
+      "subtotal": 26999,
+      "discountAmount": 24299.1,
+      "shippingCost": 0,
+      "taxAmount": 3779.86,
+      "total": 6479.76,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:01:13.124Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-3034",
+      "invoiceNumber": "INV-2026-3034",
+      "date": "2026-08-25T10:00:48.953Z",
+      "customer": {
+        "name": "عميل الحماية والتأمين",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع النصر"
+      },
+      "items": [
+        {
+          "productId": "prod-samsung-ref-450",
+          "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+          "variantId": "var-sam-silver",
+          "variantSku": "SAM-REF-RT45-SL",
+          "variantInfo": "فضي / 450 لتر",
+          "quantity": 1,
+          "price": 26999
+        }
+      ],
+      "couponCode": "TEST_PERC_10",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 26999,
+      "discountAmount": 2699.9,
+      "shippingCost": 0,
+      "taxAmount": 3779.86,
+      "total": 28078.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:00:48.953Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-2542",
+      "invoiceNumber": "INV-2026-2542",
+      "date": "2026-08-25T10:00:31.093Z",
+      "customer": {
+        "name": "عميل تجريبي",
+        "phone": "01012345678",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع 9"
+      },
+      "items": [
+        {
+          "productId": "prod-samsung-ref-450",
+          "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+          "variantId": "var-sam-silver",
+          "variantSku": "SAM-REF-RT45-SL",
+          "variantInfo": "فضي / 450 لتر",
+          "quantity": 1,
+          "price": 26999
+        }
+      ],
+      "couponCode": "WELCOME10",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 26999,
+      "discountAmount": 2699.9,
+      "shippingCost": 0,
+      "taxAmount": 3779.86,
+      "total": 28078.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:00:31.093Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
+    {
+      "id": "ORD-7212",
+      "invoiceNumber": "INV-2026-7212",
+      "date": "2026-08-25T10:00:11.751Z",
+      "customer": {
+        "name": "عميل فحص الحماية",
+        "phone": "01099998888",
+        "governorate": "القاهرة",
+        "city": "المعادي",
+        "address": "شارع 10"
+      },
+      "items": [
+        {
+          "productId": "prod-samsung-ref-450",
+          "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+          "variantId": "var-sam-silver",
+          "variantSku": "SAM-REF-RT45-SL",
+          "variantInfo": "فضي / 450 لتر",
+          "quantity": 1,
+          "price": 26999
+        }
+      ],
+      "couponCode": "VERIF_PERC_10",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "subtotal": 26999,
+      "discountAmount": 2699.9,
+      "shippingCost": 0,
+      "taxAmount": 3779.86,
+      "total": 28078.96,
+      "status": "Pending",
+      "timeline": [
+        {
+          "status": "Pending",
+          "date": "2026-08-25T10:00:11.751Z",
+          "description": "تم تسجيل الطلب في نظام متجر النخبة بنجاح وبانتظار مراجعة وتأكيد خدمة العملاء."
+        }
+      ],
+      "stockDeducted": true
+    },
     {
       "id": "ORD-6526",
       "invoiceNumber": "INV-2026-6526",
@@ -3466,10 +4057,17 @@
       "value": 10,
       "minOrderValue": 1000,
       "isActive": true,
-      "usedCount": 0,
-      "usedByUsers": [],
-      "totalDiscountGenerated": 0,
-      "oneUsePerUser": false
+      "usedCount": 2,
+      "usedByUsers": [
+        "01012345678",
+        "01099998888"
+      ],
+      "totalDiscountGenerated": 5399.8,
+      "oneUsePerUser": false,
+      "id": "coupon-welcome10",
+      "discountValue": 10,
+      "createdAt": "2026-08-25T09:54:01.737Z",
+      "updatedAt": "2026-08-25T10:01:20.422Z"
     },
     {
       "code": "EGYPT500",
@@ -3480,7 +4078,11 @@
       "usedCount": 0,
       "usedByUsers": [],
       "totalDiscountGenerated": 0,
-      "oneUsePerUser": false
+      "oneUsePerUser": false,
+      "id": "coupon-egypt500",
+      "discountValue": 500,
+      "createdAt": "2026-08-25T09:54:01.737Z",
+      "updatedAt": "2026-08-25T09:54:01.737Z"
     },
     {
       "code": "EID2026",
@@ -3488,10 +4090,132 @@
       "value": 15,
       "minOrderValue": 2000,
       "isActive": true,
+      "usedCount": 5,
+      "usedByUsers": [
+        "test@example.com",
+        "01011112222",
+        "user1@test.com",
+        "01012345678",
+        "user_1787728624103@test.com",
+        "01038172375",
+        "user_vip_1787728665561@test.com",
+        "01033935748",
+        "customer_a_1787728923138@test.com",
+        "01079396322"
+      ],
+      "totalDiscountGenerated": 17879.7,
+      "oneUsePerUser": true,
+      "id": "coupon-eid2026",
+      "discountValue": 15,
+      "createdAt": "2026-08-25T09:54:01.737Z",
+      "updatedAt": "2026-08-26T07:22:04.661Z"
+    },
+    {
+      "code": "VERIF_FIXED_500",
+      "discountType": "fixed",
+      "value": 500,
+      "discountValue": 500,
+      "minOrderValue": 0,
       "usedCount": 0,
+      "oneUsePerUser": false,
       "usedByUsers": [],
       "totalDiscountGenerated": 0,
-      "oneUsePerUser": false
+      "isActive": true,
+      "id": "coupon-verif_fixed_500",
+      "createdAt": "2026-08-25T09:58:39.773Z",
+      "updatedAt": "2026-08-25T09:58:39.773Z"
+    },
+    {
+      "code": "VERIF_PERC_10",
+      "discountType": "percentage",
+      "value": 80,
+      "discountValue": 80,
+      "minOrderValue": 0,
+      "usedCount": 1,
+      "oneUsePerUser": false,
+      "usedByUsers": [
+        "01099998888"
+      ],
+      "totalDiscountGenerated": 2699.9,
+      "isActive": true,
+      "id": "coupon-verif_perc_10",
+      "createdAt": "2026-08-25T09:58:40.420Z",
+      "updatedAt": "2026-08-25T10:00:14.470Z"
+    },
+    {
+      "code": "VERIF_PERC_100",
+      "discountType": "percentage",
+      "value": 100,
+      "discountValue": 100,
+      "minOrderValue": 0,
+      "usedCount": 0,
+      "oneUsePerUser": false,
+      "usedByUsers": [],
+      "totalDiscountGenerated": 0,
+      "isActive": true,
+      "id": "coupon-verif_perc_100",
+      "createdAt": "2026-08-25T09:58:40.991Z",
+      "updatedAt": "2026-08-25T09:58:40.991Z"
+    },
+    {
+      "code": "VERIF_FIXED_HUGE",
+      "discountType": "fixed",
+      "value": 50000,
+      "discountValue": 50000,
+      "minOrderValue": 0,
+      "usedCount": 0,
+      "oneUsePerUser": false,
+      "usedByUsers": [],
+      "totalDiscountGenerated": 0,
+      "isActive": true,
+      "id": "coupon-verif_fixed_huge",
+      "createdAt": "2026-08-25T09:58:42.658Z",
+      "updatedAt": "2026-08-25T09:58:42.658Z"
+    },
+    {
+      "code": "VERIF_CAPPED_50",
+      "discountType": "percentage",
+      "value": 50,
+      "discountValue": 50,
+      "minOrderValue": 0,
+      "maxDiscountAmount": 400,
+      "usedCount": 0,
+      "oneUsePerUser": false,
+      "usedByUsers": [],
+      "totalDiscountGenerated": 0,
+      "isActive": true,
+      "id": "coupon-verif_capped_50",
+      "createdAt": "2026-08-25T10:00:12.623Z",
+      "updatedAt": "2026-08-25T10:00:12.623Z"
+    },
+    {
+      "code": "VERIF_MIN_3000",
+      "discountType": "fixed",
+      "value": 300,
+      "discountValue": 300,
+      "minOrderValue": 3000,
+      "usedCount": 0,
+      "oneUsePerUser": false,
+      "usedByUsers": [],
+      "totalDiscountGenerated": 0,
+      "isActive": true,
+      "id": "coupon-verif_min_3000",
+      "createdAt": "2026-08-25T10:00:13.188Z",
+      "updatedAt": "2026-08-25T10:00:13.188Z"
+    },
+    {
+      "code": "VERIF_FREESHIP",
+      "discountType": "free_shipping",
+      "value": 0,
+      "discountValue": 0,
+      "usedCount": 0,
+      "oneUsePerUser": false,
+      "usedByUsers": [],
+      "totalDiscountGenerated": 0,
+      "isActive": true,
+      "id": "coupon-verif_freeship",
+      "createdAt": "2026-08-25T10:00:13.837Z",
+      "updatedAt": "2026-08-25T10:00:13.837Z"
     }
   ],
   "faqs": [
@@ -3518,6 +4242,790 @@
   ],
   "logs": [
     {
+      "id": "log-1787731045024",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل منتج",
+      "details": "تم تعديل مواصفات المنتج: Valid Product Test (تم توثيق 1 حركة جرد مخزنية)",
+      "timestamp": "2026-08-26T07:57:25.024Z"
+    },
+    {
+      "id": "log-1787730723590",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل منتج",
+      "details": "تم تعديل مواصفات المنتج: Valid Product Test (تم توثيق 1 حركة جرد مخزنية)",
+      "timestamp": "2026-08-26T07:52:03.590Z"
+    },
+    {
+      "id": "log-1787728926370",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 7068 ج.م باسم العميل عميل أ محتال",
+      "timestamp": "2026-08-26T07:22:06.370Z"
+    },
+    {
+      "id": "log-1787728924755",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:22:04.755Z"
+    },
+    {
+      "id": "log-1787728924572",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 6138 ج.م باسم العميل عميل أ",
+      "timestamp": "2026-08-26T07:22:04.572Z"
+    },
+    {
+      "id": "log-1787728666917",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:17:46.917Z"
+    },
+    {
+      "id": "log-1787728666740",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 6138 ج.م باسم العميل كريم سامي",
+      "timestamp": "2026-08-26T07:17:46.740Z"
+    },
+    {
+      "id": "log-1787728653971",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:17:33.971Z"
+    },
+    {
+      "id": "log-1787728625199",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:17:05.199Z"
+    },
+    {
+      "id": "log-1787728625017",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 44549.01 ج.م باسم العميل عميل تجريبي",
+      "timestamp": "2026-08-26T07:17:05.017Z"
+    },
+    {
+      "id": "log-1787728601083",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:16:41.083Z"
+    },
+    {
+      "id": "log-1787728600894",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 44549.01 ج.م باسم العميل أحمد محمود",
+      "timestamp": "2026-08-26T07:16:40.894Z"
+    },
+    {
+      "id": "log-1787728573785",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [EID2026]",
+      "timestamp": "2026-08-26T07:16:13.785Z"
+    },
+    {
+      "id": "log-1787728573610",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 16632 ج.م باسم العميل عميل تجريبي",
+      "timestamp": "2026-08-26T07:16:13.610Z"
+    },
+    {
+      "id": "log-1787652244484",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [FREE_SHIP_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:04.484Z"
+    },
+    {
+      "id": "log-1787652243962",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [MIN_ORDER_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:03.962Z"
+    },
+    {
+      "id": "log-1787652243425",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [CAPPED_50_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:03.425Z"
+    },
+    {
+      "id": "log-1787652242862",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [HUGE_FIXED_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:02.862Z"
+    },
+    {
+      "id": "log-1787652240882",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [PERC_100_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:00.882Z"
+    },
+    {
+      "id": "log-1787652240380",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [PERC_10_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:04:00.380Z"
+    },
+    {
+      "id": "log-1787652239883",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [FIXED_500_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:59.883Z"
+    },
+    {
+      "id": "log-1787652239399",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [FIXED_500_MT8HZBFF]",
+      "timestamp": "2026-08-25T10:03:59.399Z"
+    },
+    {
+      "id": "log-1787652239231",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 50798.86 ج.م باسم العميل عميل تجربة الخصم الثابت",
+      "timestamp": "2026-08-25T10:03:59.231Z"
+    },
+    {
+      "id": "log-1787652238586",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [CRUD_MT8HZBFF] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:58.586Z"
+    },
+    {
+      "id": "log-1787652238112",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [CRUD_MT8HZBFF]",
+      "timestamp": "2026-08-25T10:03:58.112Z"
+    },
+    {
+      "id": "log-1787652237618",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [CRUD_MT8HZBFF] بنوع خصم [fixed] وقيمة [150]",
+      "timestamp": "2026-08-25T10:03:57.618Z"
+    },
+    {
+      "id": "log-1787652234994",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [PERC_10_MT8HZBFF]",
+      "timestamp": "2026-08-25T10:03:54.994Z"
+    },
+    {
+      "id": "log-1787652234370",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [FREE_SHIP_MT8HZBFF] بنوع خصم [free_shipping] وقيمة [0]",
+      "timestamp": "2026-08-25T10:03:54.370Z"
+    },
+    {
+      "id": "log-1787652233723",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [MIN_ORDER_MT8HZBFF] بنوع خصم [fixed] وقيمة [200]",
+      "timestamp": "2026-08-25T10:03:53.723Z"
+    },
+    {
+      "id": "log-1787652233151",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [CAPPED_50_MT8HZBFF] بنوع خصم [percentage] وقيمة [50]",
+      "timestamp": "2026-08-25T10:03:53.151Z"
+    },
+    {
+      "id": "log-1787652232664",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [PERC_10_MT8HZBFF]",
+      "timestamp": "2026-08-25T10:03:52.664Z"
+    },
+    {
+      "id": "log-1787652232520",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 46798.96 ج.م باسم العميل عميل الحماية والتأمين",
+      "timestamp": "2026-08-25T10:03:52.520Z"
+    },
+    {
+      "id": "log-1787652231802",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [HUGE_FIXED_MT8HZBFF] بنوع خصم [fixed] وقيمة [99999]",
+      "timestamp": "2026-08-25T10:03:51.802Z"
+    },
+    {
+      "id": "log-1787652230193",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [PERC_100_MT8HZBFF] بنوع خصم [percentage] وقيمة [100]",
+      "timestamp": "2026-08-25T10:03:50.193Z"
+    },
+    {
+      "id": "log-1787652229602",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [PERC_10_MT8HZBFF] بنوع خصم [percentage] وقيمة [10]",
+      "timestamp": "2026-08-25T10:03:49.602Z"
+    },
+    {
+      "id": "log-1787652229001",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [FIXED_500_MT8HZBFF] بنوع خصم [fixed] وقيمة [500]",
+      "timestamp": "2026-08-25T10:03:49.001Z"
+    },
+    {
+      "id": "log-1787652207773",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [FREE_SHIP_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:27.773Z"
+    },
+    {
+      "id": "log-1787652207267",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [MIN_ORDER_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:27.267Z"
+    },
+    {
+      "id": "log-1787652206757",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [CAPPED_50_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:26.757Z"
+    },
+    {
+      "id": "log-1787652206232",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [HUGE_FIXED_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:26.232Z"
+    },
+    {
+      "id": "log-1787652204402",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [PERC_100_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:24.402Z"
+    },
+    {
+      "id": "log-1787652203913",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [PERC_10_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:23.913Z"
+    },
+    {
+      "id": "log-1787652203404",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [FIXED_500_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:23.404Z"
+    },
+    {
+      "id": "log-1787652202892",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [FIXED_500_MT8HYJ5C]",
+      "timestamp": "2026-08-25T10:03:22.892Z"
+    },
+    {
+      "id": "log-1787652202730",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 50798.86 ج.م باسم العميل عميل تجربة الخصم الثابت",
+      "timestamp": "2026-08-25T10:03:22.730Z"
+    },
+    {
+      "id": "log-1787652202038",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [CRUD_MT8HYJ5C] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:03:22.038Z"
+    },
+    {
+      "id": "log-1787652201528",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [CRUD_MT8HYJ5C]",
+      "timestamp": "2026-08-25T10:03:21.528Z"
+    },
+    {
+      "id": "log-1787652201004",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [CRUD_MT8HYJ5C] بنوع خصم [fixed] وقيمة [150]",
+      "timestamp": "2026-08-25T10:03:21.004Z"
+    },
+    {
+      "id": "log-1787652198395",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [PERC_10_MT8HYJ5C]",
+      "timestamp": "2026-08-25T10:03:18.395Z"
+    },
+    {
+      "id": "log-1787652197735",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [FREE_SHIP_MT8HYJ5C] بنوع خصم [free_shipping] وقيمة [0]",
+      "timestamp": "2026-08-25T10:03:17.735Z"
+    },
+    {
+      "id": "log-1787652197086",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [MIN_ORDER_MT8HYJ5C] بنوع خصم [fixed] وقيمة [200]",
+      "timestamp": "2026-08-25T10:03:17.086Z"
+    },
+    {
+      "id": "log-1787652196528",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [CAPPED_50_MT8HYJ5C] بنوع خصم [percentage] وقيمة [50]",
+      "timestamp": "2026-08-25T10:03:16.528Z"
+    },
+    {
+      "id": "log-1787652196009",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [PERC_10_MT8HYJ5C]",
+      "timestamp": "2026-08-25T10:03:16.009Z"
+    },
+    {
+      "id": "log-1787652195865",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 46798.96 ج.م باسم العميل عميل الحماية والتأمين",
+      "timestamp": "2026-08-25T10:03:15.865Z"
+    },
+    {
+      "id": "log-1787652195160",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [HUGE_FIXED_MT8HYJ5C] بنوع خصم [fixed] وقيمة [99999]",
+      "timestamp": "2026-08-25T10:03:15.160Z"
+    },
+    {
+      "id": "log-1787652193561",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [PERC_100_MT8HYJ5C] بنوع خصم [percentage] وقيمة [100]",
+      "timestamp": "2026-08-25T10:03:13.561Z"
+    },
+    {
+      "id": "log-1787652192977",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [PERC_10_MT8HYJ5C] بنوع خصم [percentage] وقيمة [10]",
+      "timestamp": "2026-08-25T10:03:12.977Z"
+    },
+    {
+      "id": "log-1787652192378",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [FIXED_500_MT8HYJ5C] بنوع خصم [fixed] وقيمة [500]",
+      "timestamp": "2026-08-25T10:03:12.378Z"
+    },
+    {
+      "id": "log-1787652167713",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_FREE_SHIP] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:47.713Z"
+    },
+    {
+      "id": "log-1787652167226",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_MIN_ORDER_2500] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:47.226Z"
+    },
+    {
+      "id": "log-1787652166734",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_CAPPED_50] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:46.735Z"
+    },
+    {
+      "id": "log-1787652166236",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_HUGE_FIXED] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:46.236Z"
+    },
+    {
+      "id": "log-1787652165740",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_PERC_100] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:45.740Z"
+    },
+    {
+      "id": "log-1787652165247",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_PERC_10] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:45.247Z"
+    },
+    {
+      "id": "log-1787652164748",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [TEST_FIXED_500] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:44.748Z"
+    },
+    {
+      "id": "log-1787652164214",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "حذف كوبون خصم",
+      "details": "تم حذف الكوبون [CRUD_VERIF_CODE] من النظام نهائياً",
+      "timestamp": "2026-08-25T10:02:44.214Z"
+    },
+    {
+      "id": "log-1787652163702",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [CRUD_VERIF_CODE]",
+      "timestamp": "2026-08-25T10:02:43.702Z"
+    },
+    {
+      "id": "log-1787652163212",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [CRUD_VERIF_CODE] بنوع خصم [fixed] وقيمة [150]",
+      "timestamp": "2026-08-25T10:02:43.213Z"
+    },
+    {
+      "id": "log-1787652160554",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:02:40.554Z"
+    },
+    {
+      "id": "log-1787652120038",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:02:00.038Z"
+    },
+    {
+      "id": "log-1787652096803",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:01:36.803Z"
+    },
+    {
+      "id": "log-1787652080501",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [WELCOME10]",
+      "timestamp": "2026-08-25T10:01:20.501Z"
+    },
+    {
+      "id": "log-1787652080340",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 28078.96 ج.م باسم العميل عميل تجريبي",
+      "timestamp": "2026-08-25T10:01:20.340Z"
+    },
+    {
+      "id": "log-1787652075697",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:01:15.697Z"
+    },
+    {
+      "id": "log-1787652073629",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:01:13.629Z"
+    },
+    {
+      "id": "log-1787652073486",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 6479.76 ج.م باسم العميل عميل الحماية والتأمين",
+      "timestamp": "2026-08-25T10:01:13.486Z"
+    },
+    {
+      "id": "log-1787652051885",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:00:51.885Z"
+    },
+    {
+      "id": "log-1787652051214",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_FREE_SHIP] بنوع خصم [free_shipping] وقيمة [0]",
+      "timestamp": "2026-08-25T10:00:51.214Z"
+    },
+    {
+      "id": "log-1787652050551",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_MIN_ORDER_2500] بنوع خصم [fixed] وقيمة [200]",
+      "timestamp": "2026-08-25T10:00:50.551Z"
+    },
+    {
+      "id": "log-1787652049969",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_CAPPED_50] بنوع خصم [percentage] وقيمة [50]",
+      "timestamp": "2026-08-25T10:00:49.969Z"
+    },
+    {
+      "id": "log-1787652049447",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [TEST_PERC_10]",
+      "timestamp": "2026-08-25T10:00:49.447Z"
+    },
+    {
+      "id": "log-1787652049301",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 28078.96 ج.م باسم العميل عميل الحماية والتأمين",
+      "timestamp": "2026-08-25T10:00:49.301Z"
+    },
+    {
+      "id": "log-1787652048519",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_HUGE_FIXED] بنوع خصم [fixed] وقيمة [99999]",
+      "timestamp": "2026-08-25T10:00:48.519Z"
+    },
+    {
+      "id": "log-1787652046909",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_PERC_100] بنوع خصم [percentage] وقيمة [100]",
+      "timestamp": "2026-08-25T10:00:46.909Z"
+    },
+    {
+      "id": "log-1787652046369",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_PERC_10] بنوع خصم [percentage] وقيمة [10]",
+      "timestamp": "2026-08-25T10:00:46.369Z"
+    },
+    {
+      "id": "log-1787652045755",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [TEST_FIXED_500] بنوع خصم [fixed] وقيمة [500]",
+      "timestamp": "2026-08-25T10:00:45.755Z"
+    },
+    {
+      "id": "log-1787652031569",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [WELCOME10]",
+      "timestamp": "2026-08-25T10:00:31.569Z"
+    },
+    {
+      "id": "log-1787652031402",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 28078.96 ج.م باسم العميل عميل تجريبي",
+      "timestamp": "2026-08-25T10:00:31.402Z"
+    },
+    {
+      "id": "log-1787652014546",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [VERIF_PERC_10]",
+      "timestamp": "2026-08-25T10:00:14.546Z"
+    },
+    {
+      "id": "log-1787652013912",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_FREESHIP] بنوع خصم [free_shipping] وقيمة [0]",
+      "timestamp": "2026-08-25T10:00:13.912Z"
+    },
+    {
+      "id": "log-1787652013263",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_MIN_3000] بنوع خصم [fixed] وقيمة [300]",
+      "timestamp": "2026-08-25T10:00:13.263Z"
+    },
+    {
+      "id": "log-1787652012697",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_CAPPED_50] بنوع خصم [percentage] وقيمة [50]",
+      "timestamp": "2026-08-25T10:00:12.697Z"
+    },
+    {
+      "id": "log-1787652012193",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "تعديل كوبون خصم",
+      "details": "تم تعديل إعدادات الكوبون [VERIF_PERC_10]",
+      "timestamp": "2026-08-25T10:00:12.193Z"
+    },
+    {
+      "id": "log-1787652012043",
+      "user": "العميل من الموقع",
+      "role": "Customer",
+      "action": "تقديم طلب جديد",
+      "details": "تم تسجيل طلب بقيمة 28078.96 ج.م باسم العميل عميل فحص الحماية",
+      "timestamp": "2026-08-25T10:00:12.043Z"
+    },
+    {
+      "id": "log-1787651922730",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_FIXED_HUGE] بنوع خصم [fixed] وقيمة [50000]",
+      "timestamp": "2026-08-25T09:58:42.730Z"
+    },
+    {
+      "id": "log-1787651921065",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_PERC_100] بنوع خصم [percentage] وقيمة [100]",
+      "timestamp": "2026-08-25T09:58:41.065Z"
+    },
+    {
+      "id": "log-1787651920497",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_PERC_10] بنوع خصم [percentage] وقيمة [10]",
+      "timestamp": "2026-08-25T09:58:40.497Z"
+    },
+    {
+      "id": "log-1787651919849",
+      "user": "أحمد الإدريسي (أدمن)",
+      "role": "Admin",
+      "action": "إنشاء كوبون خصم",
+      "details": "تم إنشاء كوبون جديد [VERIF_FIXED_500] بنوع خصم [fixed] وقيمة [500]",
+      "timestamp": "2026-08-25T09:58:39.849Z"
+    },
+    {
       "id": "log-1787419239174",
       "user": "العميل من الموقع",
       "role": "Customer",
@@ -3532,793 +5040,336 @@
       "action": "تسجيل حساب جديد",
       "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787419227951@example.com)",
       "timestamp": "2026-08-22T17:20:28.221Z"
-    },
-    {
-      "id": "log-1787419227853",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T17:20:27.853Z"
-    },
-    {
-      "id": "log-1787418889769",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T17:14:49.769Z"
-    },
-    {
-      "id": "log-1787418878883",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787418878603@example.com)",
-      "timestamp": "2026-08-22T17:14:38.883Z"
-    },
-    {
-      "id": "log-1787418878516",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T17:14:38.516Z"
-    },
-    {
-      "id": "log-1787417342278",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:49:02.278Z"
-    },
-    {
-      "id": "log-1787417326364",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787417326102@example.com)",
-      "timestamp": "2026-08-22T16:48:46.364Z"
-    },
-    {
-      "id": "log-1787417326000",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:48:46.000Z"
-    },
-    {
-      "id": "log-1787417236587",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:47:16.587Z"
-    },
-    {
-      "id": "log-1787417225770",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787417225493@example.com)",
-      "timestamp": "2026-08-22T16:47:05.770Z"
-    },
-    {
-      "id": "log-1787417225400",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:47:05.400Z"
-    },
-    {
-      "id": "log-1787417081927",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:44:41.927Z"
-    },
-    {
-      "id": "log-1787417071375",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787417071110@example.com)",
-      "timestamp": "2026-08-22T16:44:31.375Z"
-    },
-    {
-      "id": "log-1787417071018",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:44:31.018Z"
-    },
-    {
-      "id": "log-1787416912002",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:41:52.002Z"
-    },
-    {
-      "id": "log-1787416901205",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787416900942@example.com)",
-      "timestamp": "2026-08-22T16:41:41.205Z"
-    },
-    {
-      "id": "log-1787416900864",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:41:40.864Z"
-    },
-    {
-      "id": "log-1787416594176",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:36:34.176Z"
-    },
-    {
-      "id": "log-1787416583173",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787416582894@example.com)",
-      "timestamp": "2026-08-22T16:36:23.173Z"
-    },
-    {
-      "id": "log-1787416582802",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:36:22.802Z"
-    },
-    {
-      "id": "log-1787415324722",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:15:24.722Z"
-    },
-    {
-      "id": "log-1787415313843",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787415313556@example.com)",
-      "timestamp": "2026-08-22T16:15:13.843Z"
-    },
-    {
-      "id": "log-1787415313454",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:15:13.454Z"
-    },
-    {
-      "id": "log-1787414702856",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:05:02.856Z"
-    },
-    {
-      "id": "log-1787414692022",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787414691750@example.com)",
-      "timestamp": "2026-08-22T16:04:52.022Z"
-    },
-    {
-      "id": "log-1787414691666",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:04:51.666Z"
-    },
-    {
-      "id": "log-1787414670586",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:04:30.586Z"
-    },
-    {
-      "id": "log-1787414670040",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:04:30.040Z"
-    },
-    {
-      "id": "log-1787414659180",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787414658904@example.com)",
-      "timestamp": "2026-08-22T16:04:19.180Z"
-    },
-    {
-      "id": "log-1787414658823",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:04:18.823Z"
-    },
-    {
-      "id": "log-1787414631707",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:03:51.707Z"
-    },
-    {
-      "id": "log-1787414631165",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:03:51.165Z"
-    },
-    {
-      "id": "log-1787414622416",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787414622152@example.com)",
-      "timestamp": "2026-08-22T16:03:42.416Z"
-    },
-    {
-      "id": "log-1787414622074",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:03:42.074Z"
-    },
-    {
-      "id": "log-1787414617007",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:03:37.007Z"
-    },
-    {
-      "id": "log-1787414616457",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل عميل فحص",
-      "timestamp": "2026-08-22T16:03:36.457Z"
-    },
-    {
-      "id": "log-1787414607501",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (testuser_1787414607244@example.com)",
-      "timestamp": "2026-08-22T16:03:27.502Z"
-    },
-    {
-      "id": "log-1787414607146",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-22T16:03:27.146Z"
-    },
-    {
-      "id": "log-1787414491983",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة ملف وسائط",
-      "details": "تم رفع ملف الوسائط valid.png بنجاح",
-      "timestamp": "2026-08-22T16:01:31.983Z"
-    },
-    {
-      "id": "log-1787413767697",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: Audit User (audit_cust_1787413767341@test.com)",
-      "timestamp": "2026-08-22T15:49:27.697Z"
-    },
-    {
-      "id": "log-1787173767973",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: Test Product &lt;script&gt;alert(1)&lt;/script&gt; &amp; quotes &#x27;single&#x27;",
-      "timestamp": "2026-08-19T21:09:27.973Z"
-    },
-    {
-      "id": "log-1787173767509",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:09:27.509Z"
-    },
-    {
-      "id": "log-1787173767026",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:09:27.026Z"
-    },
-    {
-      "id": "log-1787173766551",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج تلفزيون تجريبي جديد فائق الدقة بنجاح",
-      "timestamp": "2026-08-19T21:09:26.551Z"
-    },
-    {
-      "id": "log-1787173765965",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T21:09:25.965Z"
-    },
-    {
-      "id": "log-1787173690127",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: Test Product &lt;script&gt;alert(1)&lt;/script&gt; &amp; quotes &#x27;single&#x27;",
-      "timestamp": "2026-08-19T21:08:10.127Z"
-    },
-    {
-      "id": "log-1787173689644",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:08:09.644Z"
-    },
-    {
-      "id": "log-1787173689168",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:08:09.168Z"
-    },
-    {
-      "id": "log-1787173688675",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج تلفزيون تجريبي جديد فائق الدقة بنجاح",
-      "timestamp": "2026-08-19T21:08:08.675Z"
-    },
-    {
-      "id": "log-1787173688081",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T21:08:08.081Z"
-    },
-    {
-      "id": "log-1787173668569",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: Test Product &lt;script&gt;alert(1)&lt;/script&gt; &amp; quotes &#x27;single&#x27;",
-      "timestamp": "2026-08-19T21:07:48.569Z"
-    },
-    {
-      "id": "log-1787173668088",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:07:48.088Z"
-    },
-    {
-      "id": "log-1787173667600",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: تلفزيون تجريبي جديد فائق الدقة",
-      "timestamp": "2026-08-19T21:07:47.600Z"
-    },
-    {
-      "id": "log-1787173667113",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج تلفزيون تجريبي جديد فائق الدقة بنجاح",
-      "timestamp": "2026-08-19T21:07:47.113Z"
-    },
-    {
-      "id": "log-1787173666529",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T21:07:46.529Z"
-    },
-    {
-      "id": "log-1787173655032",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج تلفزيون تجريبي جديد فائق الدقة بنجاح",
-      "timestamp": "2026-08-19T21:07:35.032Z"
-    },
-    {
-      "id": "log-1787173654452",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T21:07:34.452Z"
-    },
-    {
-      "id": "log-1787172954415",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T20:55:54.415Z"
-    },
-    {
-      "id": "log-1787172778732",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج منتج اختبار الحفظ الدائم بنجاح",
-      "timestamp": "2026-08-19T20:52:58.732Z"
-    },
-    {
-      "id": "log-1787172778528",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
-      "timestamp": "2026-08-19T20:52:58.528Z"
-    },
-    {
-      "id": "log-1787172778185",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
-      "timestamp": "2026-08-19T20:52:58.185Z"
-    },
-    {
-      "id": "log-1787172761911",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل منتج",
-      "details": "تم تعديل مواصفات المنتج: شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-08-19T20:52:41.911Z"
-    },
-    {
-      "id": "log-1786565083580",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: Remember Me Tester (remember_tester@store.com)",
-      "timestamp": "2026-08-12T20:04:43.580Z"
-    },
-    {
-      "id": "log-1786464745308",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "إضافة منتج جديد",
-      "details": "تمت إضافة المنتج Valid Product Test بنجاح",
-      "timestamp": "2026-08-11T16:12:25.308Z"
-    },
-    {
-      "id": "log-1786376219318",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51348.86 ج.م باسم العميل undefined",
-      "timestamp": "2026-08-10T15:36:59.318Z"
-    },
-    {
-      "id": "log-1786376218295",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل الفحص النهائي (customer_smoke_1786376217971@example.com)",
-      "timestamp": "2026-08-10T15:36:58.295Z"
-    },
-    {
-      "id": "log-1786376189292",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: مستخدم تجريبي (smoke_cust_1786376188945@example.com)",
-      "timestamp": "2026-08-10T15:36:29.292Z"
-    },
-    {
-      "id": "log-1786371751896",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: عميل تجريبي (customer_test@example.com)",
-      "timestamp": "2026-08-10T14:22:31.896Z"
-    },
-    {
-      "id": "log-1785158071144",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 4 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:14:31.144Z"
-    },
-    {
-      "id": "log-1785158070258",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"approved\" إلى \"rejected\"",
-      "timestamp": "2026-07-27T13:14:30.258Z"
-    },
-    {
-      "id": "log-1785158069700",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"pending\" إلى \"approved\"",
-      "timestamp": "2026-07-27T13:14:29.700Z"
-    },
-    {
-      "id": "log-1785158066862",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 5 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:14:26.862Z"
-    },
-    {
-      "id": "log-1785158064611",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة طلب",
-      "details": "تحديث حالة الطلب ORD-3279 إلى [Delivered]",
-      "timestamp": "2026-07-27T13:14:24.611Z"
-    },
-    {
-      "id": "log-1785158064349",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل العميل أحمد",
-      "timestamp": "2026-07-27T13:14:24.349Z"
-    },
-    {
-      "id": "log-1785158063792",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل مخزون",
-      "details": "تم تعديل مخزون المنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD بمقدار 50 (in_adjustment)",
-      "timestamp": "2026-07-27T13:14:23.792Z"
-    },
-    {
-      "id": "log-1785158063314",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل محمود (custb_1785158062995@test.com)",
-      "timestamp": "2026-07-27T13:14:23.314Z"
-    },
-    {
-      "id": "log-1785158062672",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل أحمد (custa_1785158062351@test.com)",
-      "timestamp": "2026-07-27T13:14:22.672Z"
-    },
-    {
-      "id": "log-1785157713333",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 4 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:08:33.333Z"
-    },
-    {
-      "id": "log-1785157712462",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"approved\" إلى \"rejected\"",
-      "timestamp": "2026-07-27T13:08:32.462Z"
-    },
-    {
-      "id": "log-1785157711915",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"pending\" إلى \"approved\"",
-      "timestamp": "2026-07-27T13:08:31.915Z"
-    },
-    {
-      "id": "log-1785157709080",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 5 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:08:29.080Z"
-    },
-    {
-      "id": "log-1785157706874",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة طلب",
-      "details": "تحديث حالة الطلب ORD-8202 إلى [Delivered]",
-      "timestamp": "2026-07-27T13:08:26.874Z"
-    },
-    {
-      "id": "log-1785157706615",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل العميل أحمد",
-      "timestamp": "2026-07-27T13:08:26.615Z"
-    },
-    {
-      "id": "log-1785157706056",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل مخزون",
-      "details": "تم تعديل مخزون المنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD بمقدار 50 (in_adjustment)",
-      "timestamp": "2026-07-27T13:08:26.056Z"
-    },
-    {
-      "id": "log-1785157705565",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل محمود (custb_1785157705256@test.com)",
-      "timestamp": "2026-07-27T13:08:25.565Z"
-    },
-    {
-      "id": "log-1785157704949",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل أحمد (custa_1785157704645@test.com)",
-      "timestamp": "2026-07-27T13:08:24.949Z"
-    },
-    {
-      "id": "log-1785157308150",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 4 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:01:48.150Z"
-    },
-    {
-      "id": "log-1785157307263",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"approved\" إلى \"rejected\"",
-      "timestamp": "2026-07-27T13:01:47.263Z"
-    },
-    {
-      "id": "log-1785157306687",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"pending\" إلى \"approved\"",
-      "timestamp": "2026-07-27T13:01:46.688Z"
-    },
-    {
-      "id": "log-1785157303780",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 5 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T13:01:43.780Z"
-    },
-    {
-      "id": "log-1785157301472",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة طلب",
-      "details": "تحديث حالة الطلب ORD-3338 إلى [Delivered]",
-      "timestamp": "2026-07-27T13:01:41.472Z"
-    },
-    {
-      "id": "log-1785157301224",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تقديم طلب جديد",
-      "details": "تم تسجيل طلب بقيمة 51298.86 ج.م باسم العميل العميل أحمد",
-      "timestamp": "2026-07-27T13:01:41.224Z"
-    },
-    {
-      "id": "log-1785157300621",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل مخزون",
-      "details": "تم تعديل مخزون المنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD بمقدار 50 (in_adjustment)",
-      "timestamp": "2026-07-27T13:01:40.621Z"
-    },
-    {
-      "id": "log-1785157300136",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل محمود (custb_1785157299820@test.com)",
-      "timestamp": "2026-07-27T13:01:40.136Z"
-    },
-    {
-      "id": "log-1785157299507",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "تسجيل حساب جديد",
-      "details": "تم تسجيل حساب عميل جديد: العميل أحمد (custa_1785157299192@test.com)",
-      "timestamp": "2026-07-27T13:01:39.507Z"
-    },
-    {
-      "id": "log-1785156746235",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 4 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T12:52:26.235Z"
-    },
-    {
-      "id": "log-1785156745381",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"approved\" إلى \"rejected\"",
-      "timestamp": "2026-07-27T12:52:25.381Z"
-    },
-    {
-      "id": "log-1785156744838",
-      "user": "أحمد الإدريسي (أدمن)",
-      "role": "Admin",
-      "action": "تعديل حالة مراجعة",
-      "details": "تم تغيير حالة مراجعة للمنتج prod-lg-oled-65 من \"pending\" إلى \"approved\"",
-      "timestamp": "2026-07-27T12:52:24.838Z"
-    },
-    {
-      "id": "log-1785156742093",
-      "user": "العميل من الموقع",
-      "role": "Customer",
-      "action": "إضافة تقييم",
-      "details": "قام العميل العميل أحمد بإضافة تقييم بـ 5 نجوم للمنتج شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
-      "timestamp": "2026-07-27T12:52:22.093Z"
     }
   ],
   "notifications": [
+    {
+      "id": "not-1787728926278",
+      "title": "طلب جديد ORD-2487",
+      "message": "طلب جديد من العميل عميل أ محتال بقيمة 7068 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:22:06.278Z",
+      "timestamp": "2026-08-26T07:22:06.278Z",
+      "metadata": {
+        "orderId": "ORD-2487",
+        "customerName": "عميل أ محتال",
+        "total": 7068
+      }
+    },
+    {
+      "id": "not-1787728924476",
+      "title": "طلب جديد ORD-9520",
+      "message": "طلب جديد من العميل عميل أ بقيمة 6138 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:22:04.476Z",
+      "timestamp": "2026-08-26T07:22:04.476Z",
+      "metadata": {
+        "orderId": "ORD-9520",
+        "customerName": "عميل أ",
+        "total": 6138
+      }
+    },
+    {
+      "id": "not-1787728666654",
+      "title": "طلب جديد ORD-4741",
+      "message": "طلب جديد من العميل كريم سامي بقيمة 6138 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:17:46.654Z",
+      "timestamp": "2026-08-26T07:17:46.654Z",
+      "metadata": {
+        "orderId": "ORD-4741",
+        "customerName": "كريم سامي",
+        "total": 6138
+      }
+    },
+    {
+      "id": "not-1787728624921",
+      "title": "طلب جديد ORD-7685",
+      "message": "طلب جديد من العميل عميل تجريبي بقيمة 44549.01 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:17:04.921Z",
+      "timestamp": "2026-08-26T07:17:04.921Z",
+      "metadata": {
+        "orderId": "ORD-7685",
+        "customerName": "عميل تجريبي",
+        "total": 44549.01
+      }
+    },
+    {
+      "id": "not-1787728600800",
+      "title": "طلب جديد ORD-6407",
+      "message": "طلب جديد من العميل أحمد محمود بقيمة 44549.01 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:16:40.800Z",
+      "timestamp": "2026-08-26T07:16:40.800Z",
+      "metadata": {
+        "orderId": "ORD-6407",
+        "customerName": "أحمد محمود",
+        "total": 44549.01
+      }
+    },
+    {
+      "id": "not-1787728573524",
+      "title": "طلب جديد ORD-9274",
+      "message": "طلب جديد من العميل عميل تجريبي بقيمة 16632 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-26T07:16:13.524Z",
+      "timestamp": "2026-08-26T07:16:13.524Z",
+      "metadata": {
+        "orderId": "ORD-9274",
+        "customerName": "عميل تجريبي",
+        "total": 16632
+      }
+    },
+    {
+      "id": "not-1787652239151",
+      "title": "طلب جديد ORD-7774",
+      "message": "طلب جديد من العميل عميل تجربة الخصم الثابت بقيمة 50798.86 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:03:59.151Z",
+      "timestamp": "2026-08-25T10:03:59.151Z",
+      "metadata": {
+        "orderId": "ORD-7774",
+        "customerName": "عميل تجربة الخصم الثابت",
+        "total": 50798.86
+      }
+    },
+    {
+      "id": "not-1787652232443",
+      "title": "طلب جديد ORD-3671",
+      "message": "طلب جديد من العميل عميل الحماية والتأمين بقيمة 46798.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:03:52.443Z",
+      "timestamp": "2026-08-25T10:03:52.443Z",
+      "metadata": {
+        "orderId": "ORD-3671",
+        "customerName": "عميل الحماية والتأمين",
+        "total": 46798.96
+      }
+    },
+    {
+      "id": "not-1787652202646",
+      "title": "طلب جديد ORD-7084",
+      "message": "طلب جديد من العميل عميل تجربة الخصم الثابت بقيمة 50798.86 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:03:22.646Z",
+      "timestamp": "2026-08-25T10:03:22.646Z",
+      "metadata": {
+        "orderId": "ORD-7084",
+        "customerName": "عميل تجربة الخصم الثابت",
+        "total": 50798.86
+      }
+    },
+    {
+      "id": "not-1787652195790",
+      "title": "طلب جديد ORD-2899",
+      "message": "طلب جديد من العميل عميل الحماية والتأمين بقيمة 46798.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:03:15.790Z",
+      "timestamp": "2026-08-25T10:03:15.790Z",
+      "metadata": {
+        "orderId": "ORD-2899",
+        "customerName": "عميل الحماية والتأمين",
+        "total": 46798.96
+      }
+    },
+    {
+      "id": "not-1787652080241",
+      "title": "طلب جديد ORD-8448",
+      "message": "طلب جديد من العميل عميل تجريبي بقيمة 28078.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:01:20.241Z",
+      "timestamp": "2026-08-25T10:01:20.241Z",
+      "metadata": {
+        "orderId": "ORD-8448",
+        "customerName": "عميل تجريبي",
+        "total": 28078.96
+      }
+    },
+    {
+      "id": "notif_1787652080160_9e2340",
+      "title": "مخزون منخفض: ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "message": "المتبقي في المخزن فقط 3 قطع للمنتج \"ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي\".",
+      "type": "stock",
+      "priority": "high",
+      "icon": "package",
+      "read": false,
+      "isRead": false,
+      "adminId": null,
+      "createdAt": "2026-08-25T10:01:20.160Z",
+      "timestamp": "2026-08-25T10:01:20.160Z",
+      "expiresAt": null,
+      "metadata": {
+        "productId": "prod-samsung-ref-450",
+        "stock": 3
+      }
+    },
+    {
+      "id": "not-1787652073407",
+      "title": "طلب جديد ORD-3168",
+      "message": "طلب جديد من العميل عميل الحماية والتأمين بقيمة 6479.76 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:01:13.407Z",
+      "timestamp": "2026-08-25T10:01:13.407Z",
+      "metadata": {
+        "orderId": "ORD-3168",
+        "customerName": "عميل الحماية والتأمين",
+        "total": 6479.76
+      }
+    },
+    {
+      "id": "notif_1787652073334_127335",
+      "title": "مخزون منخفض: ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "message": "المتبقي في المخزن فقط 4 قطع للمنتج \"ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي\".",
+      "type": "stock",
+      "priority": "high",
+      "icon": "package",
+      "read": false,
+      "isRead": false,
+      "adminId": null,
+      "createdAt": "2026-08-25T10:01:13.334Z",
+      "timestamp": "2026-08-25T10:01:13.334Z",
+      "expiresAt": null,
+      "metadata": {
+        "productId": "prod-samsung-ref-450",
+        "stock": 4
+      }
+    },
+    {
+      "id": "not-1787652049230",
+      "title": "طلب جديد ORD-3034",
+      "message": "طلب جديد من العميل عميل الحماية والتأمين بقيمة 28078.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:00:49.230Z",
+      "timestamp": "2026-08-25T10:00:49.230Z",
+      "metadata": {
+        "orderId": "ORD-3034",
+        "customerName": "عميل الحماية والتأمين",
+        "total": 28078.96
+      }
+    },
+    {
+      "id": "notif_1787652049159_d2ed32",
+      "title": "مخزون منخفض: ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "message": "المتبقي في المخزن فقط 5 قطع للمنتج \"ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي\".",
+      "type": "stock",
+      "priority": "high",
+      "icon": "package",
+      "read": false,
+      "isRead": false,
+      "adminId": null,
+      "createdAt": "2026-08-25T10:00:49.159Z",
+      "timestamp": "2026-08-25T10:00:49.159Z",
+      "expiresAt": null,
+      "metadata": {
+        "productId": "prod-samsung-ref-450",
+        "stock": 5
+      }
+    },
+    {
+      "id": "not-1787652031318",
+      "title": "طلب جديد ORD-2542",
+      "message": "طلب جديد من العميل عميل تجريبي بقيمة 28078.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:00:31.318Z",
+      "timestamp": "2026-08-25T10:00:31.318Z",
+      "metadata": {
+        "orderId": "ORD-2542",
+        "customerName": "عميل تجريبي",
+        "total": 28078.96
+      }
+    },
+    {
+      "id": "not-1787652011969",
+      "title": "طلب جديد ORD-7212",
+      "message": "طلب جديد من العميل عميل فحص الحماية بقيمة 28078.96 ج.م بانتظار تأكيد الشحن والاتصال الهاتفي.",
+      "type": "order",
+      "priority": "high",
+      "icon": "shopping-cart",
+      "read": false,
+      "isRead": false,
+      "createdAt": "2026-08-25T10:00:11.969Z",
+      "timestamp": "2026-08-25T10:00:11.969Z",
+      "metadata": {
+        "orderId": "ORD-7212",
+        "customerName": "عميل فحص الحماية",
+        "total": 28078.96
+      }
+    },
+    {
+      "id": "notif_1787651878903_00e71b",
+      "title": "تنبيه أمني: محاولة دخول فاشلة",
+      "message": "محاولة دخول فاشلة باستخدام البريد الإلكتروني (admin@store.com).",
+      "type": "security",
+      "priority": "urgent",
+      "icon": "shield-alert",
+      "read": false,
+      "isRead": false,
+      "adminId": null,
+      "createdAt": "2026-08-25T09:57:58.903Z",
+      "timestamp": "2026-08-25T09:57:58.903Z",
+      "expiresAt": null,
+      "metadata": {
+        "email": "admin@store.com",
+        "ipAddress": "127.0.0.1"
+      }
+    },
     {
       "id": "not-1787419239097",
       "title": "طلب جديد ORD-6526",
@@ -5395,6 +6446,18 @@
       "wishlist": [],
       "savedCart": [],
       "notifications": [
+        {
+          "id": "not-order-confirm-ORD-9274",
+          "title": "تم تأكيد طلبك بنجاح",
+          "message": "تم استلام طلبك رقم INV-2026-9274 بنجاح. إجمالي الطلب: 16632 ج.م. سنبدأ تجهيز طلبك قريبًا.",
+          "type": "order",
+          "isRead": false,
+          "timestamp": "2026-08-26T07:16:13.524Z",
+          "metadata": {
+            "orderId": "ORD-9274",
+            "invoiceNumber": "INV-2026-9274"
+          }
+        },
         {
           "id": "not-ord-1785158064522-368",
           "title": "تحديث حالة الطلب (INV-2026-3279)",
@@ -13124,6 +14187,445 @@
   ],
   "stockMovements": [
     {
+      "id": "sm_9b87af20eeb80c91",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "out_adjustment",
+      "movementType": "out_adjustment",
+      "quantity": 2,
+      "quantityDelta": -2,
+      "previousStock": 34,
+      "newStock": 32,
+      "reason": "Tamper Test",
+      "note": "Tamper Test",
+      "performedBy": "مسؤول النظام",
+      "performedByName": "مسؤول النظام",
+      "createdBy": "مسؤول النظام",
+      "createdAt": "2026-08-26T07:57:26.112Z",
+      "timestamp": "2026-08-26T07:57:26.112Z"
+    },
+    {
+      "id": "sm_b0f08e1e5ac31776",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "in_adjustment",
+      "movementType": "in_adjustment",
+      "quantity": 2,
+      "quantityDelta": 2,
+      "previousStock": 32,
+      "newStock": 34,
+      "reason": "Seq 2",
+      "note": "Seq 2",
+      "performedBy": "Admin",
+      "performedByName": "Admin",
+      "createdBy": "Admin",
+      "createdAt": "2026-08-26T07:57:25.941Z",
+      "timestamp": "2026-08-26T07:57:25.941Z"
+    },
+    {
+      "id": "sm_b88192d7271ceb81",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "in_adjustment",
+      "movementType": "in_adjustment",
+      "quantity": 2,
+      "quantityDelta": 2,
+      "previousStock": 30,
+      "newStock": 32,
+      "reason": "Seq 1",
+      "note": "Seq 1",
+      "performedBy": "Admin",
+      "performedByName": "Admin",
+      "createdBy": "Admin",
+      "createdAt": "2026-08-26T07:57:25.857Z",
+      "timestamp": "2026-08-26T07:57:25.857Z"
+    },
+    {
+      "id": "sm_0666fd519d513552",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "productName": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-55",
+      "variantInfo": "55 بوصة / SKU: LG-OLED-55C3",
+      "variantSku": "LG-OLED-55C3",
+      "type": "out_damaged",
+      "movementType": "out_damaged",
+      "quantity": 1,
+      "quantityDelta": -1,
+      "previousStock": 37,
+      "newStock": 36,
+      "reason": "موديل تالف",
+      "note": "موديل تالف",
+      "performedBy": "admin_02",
+      "performedByName": "فاحص الجودة",
+      "adminId": "admin_02",
+      "createdBy": "فاحص الجودة",
+      "createdAt": "2026-08-26T07:57:25.534Z",
+      "timestamp": "2026-08-26T07:57:25.534Z"
+    },
+    {
+      "id": "sm_75e2d203a4fa53b3",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "in_adjustment",
+      "movementType": "in_adjustment",
+      "quantity": 15,
+      "quantityDelta": 15,
+      "previousStock": 15,
+      "newStock": 30,
+      "reason": "استلام شحنة إضافية",
+      "note": "ملاحظة فحص 2",
+      "performedBy": "admin_01",
+      "performedByName": "مروان المحاسب",
+      "adminId": "admin_01",
+      "createdBy": "مروان المحاسب",
+      "createdAt": "2026-08-26T07:57:25.366Z",
+      "timestamp": "2026-08-26T07:57:25.366Z"
+    },
+    {
+      "id": "sm_1a8f61d89032c411",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "out_adjustment",
+      "movementType": "out_adjustment",
+      "quantity": 5,
+      "quantityDelta": -5,
+      "previousStock": 20,
+      "newStock": 15,
+      "reason": "تخفيض تجريبي للجرد",
+      "note": "ملاحظة فحص 1",
+      "performedBy": "admin_01",
+      "performedByName": "مروان المحاسب",
+      "adminId": "admin_01",
+      "createdBy": "مروان المحاسب",
+      "createdAt": "2026-08-26T07:57:25.194Z",
+      "timestamp": "2026-08-26T07:57:25.194Z"
+    },
+    {
+      "id": "sm_8250428e53abfe64",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "in_adjustment",
+      "movementType": "manual_adjustment",
+      "quantity": 2,
+      "quantityDelta": 2,
+      "previousStock": 18,
+      "newStock": 20,
+      "reason": "Reset stock for test",
+      "note": "Reset stock for test",
+      "performedBy": "Setup",
+      "performedByName": "Setup",
+      "createdBy": "Setup",
+      "createdAt": "2026-08-26T07:57:24.930Z",
+      "timestamp": "2026-08-26T07:57:24.930Z"
+    },
+    {
+      "id": "sm_eb1bba39f855bbcd",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "productName": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-55",
+      "variantInfo": "55 بوصة / SKU: LG-OLED-55C3",
+      "variantSku": "LG-OLED-55C3",
+      "type": "out_damaged",
+      "movementType": "out_damaged",
+      "quantity": 1,
+      "quantityDelta": -1,
+      "previousStock": 38,
+      "newStock": 37,
+      "reason": "بضاعة تالفة أثناء النقل",
+      "note": "بضاعة تالفة أثناء النقل",
+      "performedBy": "مفتش الجودة",
+      "performedByName": "مفتش الجودة",
+      "createdBy": "مفتش الجودة",
+      "createdAt": "2026-08-26T07:52:03.677Z",
+      "timestamp": "2026-08-26T07:52:03.677Z"
+    },
+    {
+      "id": "sm_e20555ef0ea3601f",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "out_adjustment",
+      "movementType": "manual_adjustment",
+      "quantity": 2,
+      "quantityDelta": -2,
+      "previousStock": 20,
+      "newStock": 18,
+      "reason": "تعديل رصيد عبر شاشة تحرير المنتج",
+      "note": "تعديل رصيد عبر شاشة تحرير المنتج",
+      "performedBy": "مسؤول المستودع",
+      "performedByName": "مسؤول المستودع",
+      "createdBy": "مسؤول المستودع",
+      "createdAt": "2026-08-26T07:52:03.503Z",
+      "timestamp": "2026-08-26T07:52:03.503Z"
+    },
+    {
+      "id": "sm_4efe974a907d190a",
+      "productId": "prod-samsung-1786464745102",
+      "productTitle": "Valid Product Test",
+      "productName": "Valid Product Test",
+      "type": "in_adjustment",
+      "movementType": "in_adjustment",
+      "quantity": 5,
+      "quantityDelta": 5,
+      "previousStock": 15,
+      "newStock": 20,
+      "reason": "تسوية رصيد منتج مفرد بالإيجاب",
+      "note": "تسوية رصيد منتج مفرد بالإيجاب",
+      "performedBy": "أدمن النظام",
+      "performedByName": "أدمن النظام",
+      "createdBy": "أدمن النظام",
+      "createdAt": "2026-08-26T07:52:03.329Z",
+      "timestamp": "2026-08-26T07:52:03.329Z"
+    },
+    {
+      "id": "sm_41946ef5ad4ca765",
+      "productId": "prod-sharp-micro-25",
+      "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+      "variantId": "var-sharp-25",
+      "variantInfo": "25 لتر / SKU: SHRP-MIC-25L-GR",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 10,
+      "newStock": 9,
+      "referenceId": "ORD-2487",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:22:06.184Z",
+      "timestamp": "2026-08-26T07:22:06.184Z"
+    },
+    {
+      "id": "sm_80c0e3cd61f86dad",
+      "productId": "prod-sharp-micro-25",
+      "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+      "variantId": "var-sharp-25",
+      "variantInfo": "25 لتر / SKU: SHRP-MIC-25L-GR",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 11,
+      "newStock": 10,
+      "referenceId": "ORD-9520",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:22:04.384Z",
+      "timestamp": "2026-08-26T07:22:04.384Z"
+    },
+    {
+      "id": "sm_253271c722c4ac24",
+      "productId": "prod-sharp-micro-25",
+      "productTitle": "مايكروويف شارب ديجيتال 25 لتر بالشواية فضي",
+      "variantId": "var-sharp-25",
+      "variantInfo": "25 لتر / SKU: SHRP-MIC-25L-GR",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 12,
+      "newStock": 11,
+      "referenceId": "ORD-4741",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:17:46.568Z",
+      "timestamp": "2026-08-26T07:17:46.568Z"
+    },
+    {
+      "id": "sm_ba36fcc06de091c9",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 518,
+      "newStock": 517,
+      "referenceId": "ORD-7685",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:17:04.831Z",
+      "timestamp": "2026-08-26T07:17:04.831Z"
+    },
+    {
+      "id": "sm_d3002061485d807a",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 519,
+      "newStock": 518,
+      "referenceId": "ORD-6407",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:16:40.711Z",
+      "timestamp": "2026-08-26T07:16:40.711Z"
+    },
+    {
+      "id": "sm_49840d54e2b44cbc",
+      "productId": "prod-toshiba-wash-11",
+      "productTitle": "غسالة ملابس توشيبا فوق أوتوماتيك سعة 11 كيلو جرام",
+      "variantId": "var-tosh-11",
+      "variantInfo": "11 كيلو / SKU: TOSH-WASH-11KG",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 12,
+      "newStock": 11,
+      "referenceId": "ORD-9274",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-26T07:16:13.434Z",
+      "timestamp": "2026-08-26T07:16:13.434Z"
+    },
+    {
+      "id": "sm_1fb82b380cde0803",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 520,
+      "newStock": 519,
+      "referenceId": "ORD-7774",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:03:59.075Z",
+      "timestamp": "2026-08-25T10:03:59.075Z"
+    },
+    {
+      "id": "sm_7298b034ca4dc087",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 521,
+      "newStock": 520,
+      "referenceId": "ORD-3671",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:03:52.369Z",
+      "timestamp": "2026-08-25T10:03:52.369Z"
+    },
+    {
+      "id": "sm_a267cac309c348e3",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 522,
+      "newStock": 521,
+      "referenceId": "ORD-7084",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:03:22.569Z",
+      "timestamp": "2026-08-25T10:03:22.569Z"
+    },
+    {
+      "id": "sm_feb94c435d4e2b8f",
+      "productId": "prod-lg-oled-65",
+      "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
+      "variantId": "var-lg-65",
+      "variantInfo": "65 بوصة / SKU: LG-OLED-65C3",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 523,
+      "newStock": 522,
+      "referenceId": "ORD-2899",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:03:15.716Z",
+      "timestamp": "2026-08-25T10:03:15.716Z"
+    },
+    {
+      "id": "sm_0b0c7bd7ead26044",
+      "productId": "prod-samsung-ref-450",
+      "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "variantId": "var-sam-silver",
+      "variantInfo": "فضي / 450 لتر / SKU: SAM-REF-RT45-SL",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 1,
+      "newStock": 0,
+      "referenceId": "ORD-8448",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:01:20.081Z",
+      "timestamp": "2026-08-25T10:01:20.081Z"
+    },
+    {
+      "id": "sm_24593fa17c55475f",
+      "productId": "prod-samsung-ref-450",
+      "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "variantId": "var-sam-silver",
+      "variantInfo": "فضي / 450 لتر / SKU: SAM-REF-RT45-SL",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 2,
+      "newStock": 1,
+      "referenceId": "ORD-3168",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:01:13.254Z",
+      "timestamp": "2026-08-25T10:01:13.254Z"
+    },
+    {
+      "id": "sm_9f421e766c5cc7d1",
+      "productId": "prod-samsung-ref-450",
+      "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "variantId": "var-sam-silver",
+      "variantInfo": "فضي / 450 لتر / SKU: SAM-REF-RT45-SL",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 3,
+      "newStock": 2,
+      "referenceId": "ORD-3034",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:00:49.084Z",
+      "timestamp": "2026-08-25T10:00:49.084Z"
+    },
+    {
+      "id": "sm_977e85f0a2690612",
+      "productId": "prod-samsung-ref-450",
+      "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "variantId": "var-sam-silver",
+      "variantInfo": "فضي / 450 لتر / SKU: SAM-REF-RT45-SL",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 4,
+      "newStock": 3,
+      "referenceId": "ORD-2542",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:00:31.241Z",
+      "timestamp": "2026-08-25T10:00:31.241Z"
+    },
+    {
+      "id": "sm_5c81d8aaeedb100c",
+      "productId": "prod-samsung-ref-450",
+      "productTitle": "ثلاجة سامسونج ديجيتال إنفرتر نوفروست 450 لتر فضي",
+      "variantId": "var-sam-silver",
+      "variantInfo": "فضي / 450 لتر / SKU: SAM-REF-RT45-SL",
+      "type": "out_sale",
+      "quantity": 1,
+      "previousStock": 5,
+      "newStock": 4,
+      "referenceId": "ORD-7212",
+      "reason": "طلب عميل",
+      "createdBy": "النظام",
+      "createdAt": "2026-08-25T10:00:11.892Z",
+      "timestamp": "2026-08-25T10:00:11.892Z"
+    },
+    {
       "id": "sm_9442bb3d38d6f9f2",
       "productId": "prod-lg-oled-65",
       "productTitle": "شاشة تلفزيون إل جي OLED65C3 65 بوصة ذكية 4K UHD",
@@ -15196,6 +16698,150 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "audit_1787652228490_1lgvek",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:03:48.490Z"
+    },
+    {
+      "id": "audit_1787652213846_ni28yk",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:03:33.846Z"
+    },
+    {
+      "id": "audit_1787652191838_ec25f9",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:03:11.838Z"
+    },
+    {
+      "id": "audit_1787652155511_oodzns",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:02:35.511Z"
+    },
+    {
+      "id": "audit_1787652144881_ndvp0r",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:02:24.881Z"
+    },
+    {
+      "id": "audit_1787652140861_fcd6zv",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:02:20.861Z"
+    },
+    {
+      "id": "audit_1787652115031_tfgypz",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:01:55.031Z"
+    },
+    {
+      "id": "audit_1787652091264_bnxjz2",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:01:31.264Z"
+    },
+    {
+      "id": "audit_1787652069690_cse0y9",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:01:09.690Z"
+    },
+    {
+      "id": "audit_1787652045258_jpa2sj",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:00:45.258Z"
+    },
+    {
+      "id": "audit_1787652008322_lk7rjw",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T10:00:08.322Z"
+    },
+    {
+      "id": "audit_1787651919341_0rgdze",
+      "adminId": "admin-1",
+      "adminName": "أحمد الإدريسي",
+      "action": "Login",
+      "entityType": "AdminUser",
+      "entityId": "admin@store.com",
+      "description": "تسجيل دخول ناجح للوحة التحكم (أحمد الإدريسي)",
+      "ipAddress": "127.0.0.1",
+      "userAgent": "node",
+      "createdAt": "2026-08-25T09:58:39.341Z"
+    },
     {
       "id": "audit_1787419237247_vr968r",
       "adminId": "admin-1787419236568",
@@ -18517,6 +20163,18 @@
       "active": true,
       "isDeleted": false,
       "createdAt": "2026-08-01T00:00:00.000Z"
+    },
+    {
+      "id": "perm-20",
+      "key": "social.manage",
+      "name": "إدارة روابط التواصل",
+      "group": "settings",
+      "module": "settings",
+      "description": "إدارة وتعديل وحذف وإعادة ترتيب منصات التواصل الاجتماعي",
+      "isSystem": true,
+      "active": true,
+      "isDeleted": false,
+      "createdAt": "2026-08-01T00:00:00.000Z"
     }
   ],
   "adminUsers": [
@@ -18546,15 +20204,16 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ],
       "active": true,
       "isActive": true,
       "isDeleted": false,
       "createdAt": "2026-08-01T00:00:00.000Z",
-      "updatedAt": "2026-08-22T17:20:25.202Z",
-      "lastLogin": "2026-08-22T17:20:25.136Z",
-      "lastLoginAt": "2026-08-22T17:20:25.136Z"
+      "updatedAt": "2026-08-25T10:03:48.261Z",
+      "lastLogin": "2026-08-25T10:03:48.194Z",
+      "lastLoginAt": "2026-08-25T10:03:48.194Z"
     },
     {
       "id": "user-prod-1786371750258",
@@ -18666,7 +20325,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18704,7 +20364,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18741,7 +20402,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18776,7 +20438,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18811,7 +20474,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18846,7 +20510,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18881,7 +20546,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18916,7 +20582,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18951,7 +20618,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -18986,7 +20654,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -19021,7 +20690,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -19056,7 +20726,8 @@
         "reviews.manage",
         "media.manage",
         "returns.view",
-        "returns.manage"
+        "returns.manage",
+        "social.manage"
       ]
     },
     {
@@ -20050,8 +21721,69 @@
       "roleId": "role-1787419235221",
       "permissionKey": "products.view",
       "grantedAt": "2026-08-22T17:20:35.895Z"
+    },
+    {
+      "id": "rp-super-social-manage",
+      "roleId": "role-super-admin",
+      "permissionKey": "social.manage",
+      "grantedAt": "2026-08-25T09:38:40.496Z"
     }
   ],
   "adminPermissionOverrides": [],
-  "returns": []
+  "returns": [],
+  "folders": [
+    {
+      "id": "folder_products",
+      "name": "المنتجات",
+      "count": 0,
+      "isSystem": true
+    },
+    {
+      "id": "folder_banners",
+      "name": "اللافتات",
+      "count": 0,
+      "isSystem": true
+    },
+    {
+      "id": "folder_logos",
+      "name": "الشعارات",
+      "count": 0,
+      "isSystem": true
+    }
+  ],
+  "socialLinks": [
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "url": "https://facebook.com",
+      "icon": "facebook",
+      "enabled": true,
+      "order": 1,
+      "openInNewTab": true,
+      "createdAt": "2026-08-25T09:38:40.496Z",
+      "updatedAt": "2026-08-25T09:38:40.496Z"
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "url": "https://instagram.com",
+      "icon": "instagram",
+      "enabled": true,
+      "order": 2,
+      "openInNewTab": true,
+      "createdAt": "2026-08-25T09:38:40.496Z",
+      "updatedAt": "2026-08-25T09:38:40.496Z"
+    },
+    {
+      "id": "twitter",
+      "name": "Twitter",
+      "url": "https://twitter.com",
+      "icon": "twitter",
+      "enabled": true,
+      "order": 3,
+      "openInNewTab": true,
+      "createdAt": "2026-08-25T09:38:40.496Z",
+      "updatedAt": "2026-08-25T09:38:40.496Z"
+    }
+  ]
 }

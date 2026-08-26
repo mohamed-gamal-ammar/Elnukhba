@@ -119,16 +119,17 @@ export default function CheckoutForm({
   // Calculate dynamic coupon discount based on cart subtotal, shipping cost, and active coupon
   let effectiveCouponDiscount = couponDiscount;
   if (activeCoupon) {
+    const rawVal = activeCoupon.value !== undefined ? activeCoupon.value : (activeCoupon.discountValue !== undefined ? activeCoupon.discountValue : 0);
     if (activeCoupon.minOrderValue && cartSubtotal < activeCoupon.minOrderValue) {
       effectiveCouponDiscount = 0;
     } else if (activeCoupon.discountType === 'percentage') {
-      let d = (cartSubtotal * activeCoupon.value) / 100;
+      let d = (cartSubtotal * rawVal) / 100;
       if (activeCoupon.maxDiscountAmount && d > activeCoupon.maxDiscountAmount) {
         d = activeCoupon.maxDiscountAmount;
       }
       effectiveCouponDiscount = Math.round(d);
     } else if (activeCoupon.discountType === 'fixed') {
-      effectiveCouponDiscount = Math.min(activeCoupon.value, cartSubtotal);
+      effectiveCouponDiscount = Math.min(rawVal, cartSubtotal);
     } else if (activeCoupon.discountType === 'free_shipping') {
       effectiveCouponDiscount = shippingCost;
     }
@@ -508,10 +509,12 @@ export default function CheckoutForm({
                 <span>المجموع الفرعي للأجهزة:</span>
                 <span className="text-slate-900 dark:text-white font-bold">{cartSubtotal} ج.م</span>
               </div>
-              <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
-                <span>خصم الكوبون {couponCode ? `(${couponCode})` : ""}:</span>
-                <span>-{effectiveCouponDiscount} ج.م</span>
-              </div>
+              {effectiveCouponDiscount > 0 && (
+                <div className="flex justify-between items-center text-emerald-600 dark:text-emerald-400">
+                  <span>خصم الكوبون {couponCode ? `(${couponCode})` : ""}:</span>
+                  <span>-{effectiveCouponDiscount} ج.م</span>
+                </div>
+              )}
               <div className="flex justify-between items-center">
                 <span>ضريبة القيمة المضافة الإجبارية ({settings.taxRate * 100}%):</span>
                 <span className="text-slate-900 dark:text-white font-bold">{taxAmount} ج.م</span>

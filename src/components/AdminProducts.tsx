@@ -888,6 +888,23 @@ export default function AdminProducts({ onRefreshAll }: AdminProductsProps) {
               </div>
             </div>
 
+            {/* Optional Stock Adjustment Reason when editing existing product */}
+            {!showAddForm && (
+              <div className="flex flex-col gap-1.5 p-3 bg-amber-500/5 border border-amber-500/20 rounded-lg">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                  <span>سبب أو بيان تعديل المخزون (اختياري - يوثق في سجل حركات الجرد)</span>
+                  <span className="text-[10px] text-amber-600 dark:text-amber-400 font-normal">Audit Ledger Enabled</span>
+                </label>
+                <input
+                  type="text"
+                  value={(editingProduct as any).stockAdjustmentReason || ''}
+                  onChange={(e) => setEditingProduct({ ...editingProduct, stockAdjustmentReason: e.target.value } as any)}
+                  placeholder="مثال: تصحيح جرد فعلي، بضاعة تالفة، استلام شحنة إضافية..."
+                  className="w-full text-xs bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:border-amber-500 font-sans"
+                />
+              </div>
+            )}
+
             {/* Brand, Category */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">

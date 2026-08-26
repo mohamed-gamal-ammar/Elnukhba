@@ -26,7 +26,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import api, { getFriendlyErrorMessage } from '../lib/api.js';
-import { MediaItem } from '../types.js';
+import { MediaItem, MediaFolder } from '../types.js';
 import { AdminTablePagination } from './AdminTableComponents.js';
 import { CustomSelect } from './CustomSelect.js';
 
@@ -65,9 +65,13 @@ export default function AdminMediaLibrary({
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'name' | 'size'>('newest'); // newest, oldest, name, size
   
   // Folders list
+  const [folderObjects, setFolderObjects] = useState<MediaFolder[]>([]);
   const [folders, setFolders] = useState<string[]>(['المنتجات', 'اللافتات', 'الشعارات']);
   const [newFolderName, setNewFolderName] = useState('');
   const [showNewFolderInput, setShowNewFolderInput] = useState(false);
+  const [deletingFolderId, setDeletingFolderId] = useState<string | null>(null);
+  const [editingFolderId, setEditingFolderId] = useState<string | null>(null);
+  const [editingFolderName, setEditingFolderName] = useState('');
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
@@ -90,26 +94,37 @@ export default function AdminMediaLibrary({
   const replaceInputRef = useRef<HTMLInputElement>(null);
   const sidebarEndRef = useRef<HTMLDivElement>(null);
 
-  // Fetch Media
+  // Fetch Media and Folders
   const fetchMediaList = async (selectFirst = false) => {
     setLoading(true);
     setGlobalError('');
     try {
-      const res = await api.getMedia();
-      if (res && res.success) {
-        setMedia(res.media);
+      const [mediaRes, foldersRes] = await Promise.allSettled([
+        api.getMedia(),
+        api.getMediaFolders()
+      ]);
+
+      if (mediaRes.status === 'fulfilled' && mediaRes.value && mediaRes.value.success) {
+        const fetchedMedia = mediaRes.value.media;
+        setMedia(fetchedMedia);
         
         // Retain selection if they still exist
-        const updatedSelected = selectedIds.filter(id => res.media.some(m => m.id === id));
+        const updatedSelected = selectedIds.filter(id => fetchedMedia.some(m => m.id === id));
         setSelectedIds(updatedSelected);
         
         // Update active item if selected
         if (activeItem) {
-          const updatedActive = res.media.find(m => m.id === activeItem.id) || null;
+          const updatedActive = fetchedMedia.find(m => m.id === activeItem.id) || null;
           setActiveItem(updatedActive);
-        } else if (selectFirst && res.media.length > 0) {
-          setActiveItem(res.media[0]);
+        } else if (selectFirst && fetchedMedia.length > 0) {
+          setActiveItem(fetchedMedia[0]);
         }
+      }
+
+      if (foldersRes.status === 'fulfilled' && foldersRes.value && foldersRes.value.folders) {
+        setFolderObjects(foldersRes.value.folders);
+        const folderNames = foldersRes.value.folders.map(f => f.name);
+        setFolders(folderNames);
       }
     } catch (err: any) {
       console.error('Failed to load media:', err);
@@ -123,18 +138,12 @@ export default function AdminMediaLibrary({
     fetchMediaList(true);
   }, []);
 
-  // Sync folders from unique tags in media
+  // Sync folders from backend folderObjects (single source of truth)
   useEffect(() => {
-    const uniqueFolders = Array.from(new Set(
-      media
-        .map(m => m.folder)
-        .filter((f): f is string => typeof f === 'string' && f !== '')
-    ));
-    setFolders(prev => {
-      const combined = Array.from(new Set([...prev, ...uniqueFolders]));
-      return combined;
-    });
-  }, [media]);
+    if (folderObjects.length > 0) {
+      setFolders(folderObjects.map(f => f.name));
+    }
+  }, [folderObjects]);
 
   // Drag and Drop Handlers
   const handleDrag = (e: DragEvent) => {
@@ -401,17 +410,116 @@ export default function AdminMediaLibrary({
   };
 
   // Create folder
-  const handleCreateFolder = () => {
-    if (!newFolderName.trim()) return;
-    if (folders.includes(newFolderName.trim())) {
+  const handleCreateFolder = async (customName?: string) => {
+    const trimmed = (typeof customName === 'string' ? customName : newFolderName).trim();
+    if (!trimmed) return;
+    if (folders.some(f => f.toLowerCase() === trimmed.toLowerCase())) {
       setGlobalError('المجلد موجود بالفعل.');
       return;
     }
-    setFolders(prev => [...prev, newFolderName.trim()]);
-    setActiveFolder(newFolderName.trim());
-    setNewFolderName('');
-    setShowNewFolderInput(false);
-    setGlobalSuccess('تم إنشاء مجلد تنظيمي جديد.');
+    
+    try {
+      const createdFolder = await api.createMediaFolder(trimmed);
+      if (createdFolder) {
+        setFolderObjects(prev => [...prev, createdFolder]);
+        setFolders(prev => Array.from(new Set([...prev, createdFolder.name])));
+        setActiveFolder(createdFolder.name);
+        setNewFolderName('');
+        setShowNewFolderInput(false);
+        setGlobalSuccess(`تم إنشاء المجلد "${createdFolder.name}" بنجاح.`);
+      }
+    } catch (err: any) {
+      console.error('فشل في حفظ المجلد:', err);
+      setGlobalError(getFriendlyErrorMessage(err, 'فشل في حفظ المجلد.'));
+    }
+  };
+
+  // Rename folder
+  const handleStartRenameFolder = (folderId: string, currentName: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setEditingFolderId(folderId);
+    setEditingFolderName(currentName);
+  };
+
+  const handleSaveRenameFolder = async (folderId: string, e?: React.MouseEvent | React.KeyboardEvent) => {
+    if (e) e.stopPropagation();
+    const trimmed = editingFolderName.trim();
+    if (!trimmed) {
+      setEditingFolderId(null);
+      return;
+    }
+
+    const currentFolder = folderObjects.find(f => f.id === folderId);
+    if (!currentFolder || currentFolder.name === trimmed) {
+      setEditingFolderId(null);
+      return;
+    }
+
+    if (folderObjects.some(f => f.id !== folderId && f.name.toLowerCase() === trimmed.toLowerCase())) {
+      setGlobalError('يوجد مجلد آخر بنفس هذا الاسم.');
+      return;
+    }
+
+    try {
+      const res = await api.renameMediaFolder(folderId, trimmed);
+      if (res && res.success) {
+        const oldName = currentFolder.name;
+        setFolderObjects(prev => prev.map(f => f.id === folderId ? { ...f, name: trimmed } : f));
+        setFolders(prev => prev.map(name => name === oldName ? trimmed : name));
+        if (activeFolder === oldName) {
+          setActiveFolder(trimmed);
+        }
+        setGlobalSuccess(`تمت إعادة تسمية المجلد إلى "${trimmed}" بنجاح.`);
+        await fetchMediaList();
+      }
+    } catch (err: any) {
+      console.error('فشل في تعديل اسم المجلد:', err);
+      setGlobalError(getFriendlyErrorMessage(err, 'فشل في تعديل اسم المجلد.'));
+    } finally {
+      setEditingFolderId(null);
+    }
+  };
+
+  // Delete folder
+  const handleDeleteFolder = async (folderIdOrName: string, e: React.MouseEvent) => {
+    e.stopPropagation(); // منع تحديد المجلد عند الضغط على زر الحذف
+    const folderObj = folderObjects.find(f => f.id === folderIdOrName || f.name === folderIdOrName);
+    if (folderObj && folderObj.isSystem) {
+      setGlobalError('لا يمكن حذف المجلدات النظامية.');
+      return;
+    }
+
+    const folderDisplayName = folderObj?.name || folderIdOrName;
+    const folderIdentifier = folderObj?.id || folderIdOrName;
+    
+    // Check if folder contains images
+    const itemsInFolder = media.filter(m => m.folderId === folderIdentifier || m.folder === folderDisplayName);
+    
+    let confirmPrompt = `هل أنت متأكد من حذف مجلد "${folderDisplayName}"؟`;
+    if (itemsInFolder.length > 0) {
+      confirmPrompt += `\n\nيحتوي المجلد على ${itemsInFolder.length} ملف/ملفات وسائط. سيتم نقل هذه الصور إلى القسم الرئيسي (Root) بدون حذف ملفات الصور.`;
+    }
+
+    if (!window.confirm(confirmPrompt)) {
+      return;
+    }
+
+    setDeletingFolderId(folderIdentifier);
+    try {
+      const res = await api.deleteMediaFolder(folderIdentifier, { moveToRoot: true });
+      setFolderObjects(prev => prev.filter(f => f.id !== folderIdentifier && f.name !== folderDisplayName));
+      setFolders(prev => prev.filter(f => f !== folderDisplayName));
+      if (activeFolder === folderDisplayName) {
+        setActiveFolder('all');
+      }
+      setGlobalSuccess(`تم حذف المجلد "${folderDisplayName}" بنجاح.`);
+      await fetchMediaList();
+    } catch (err: any) {
+      console.error('فشل في حذف المجلد:', err);
+      setGlobalError(getFriendlyErrorMessage(err, 'فشل في حذف المجلد.'));
+    } finally {
+      setDeletingFolderId(null);
+    }
   };
 
   // Copy Image URL Helper
@@ -717,21 +825,96 @@ export default function AdminMediaLibrary({
 
               <div className="h-px bg-slate-200 dark:bg-slate-900 my-2"></div>
 
-              {folders.map((folder, i) => {
-                const count = media.filter(m => m.folder === folder).length;
-                return (
-                  <button 
-                    key={i}
-                    type="button"
-                    onClick={() => setActiveFolder(folder)}
-                    className={`w-full flex items-center justify-between text-xs px-3 py-2 rounded-xl transition-colors cursor-pointer ${activeFolder === folder ? 'bg-amber-500/10 text-amber-600 dark:text-amber-500 font-bold border border-amber-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900'}`}
-                  >
-                    <div className="flex items-center gap-2 truncate max-w-[80%]">
-                      <Folder className="w-3.5 h-3.5" />
-                      <span className="truncate">{folder}</span>
+              {folders.map((folderName, i) => {
+                const folderObj = folderObjects.find(f => f.name === folderName);
+                const folderId = folderObj?.id || `folder_${i}`;
+                const isSystem = folderObj ? folderObj.isSystem : ['المنتجات', 'اللافتات', 'الشعارات'].includes(folderName);
+                const count = folderObj?.count !== undefined 
+                  ? folderObj.count 
+                  : media.filter(m => m.folder === folderName || m.folderId === folderId).length;
+                const isDeleting = deletingFolderId === folderId;
+                const isEditingThisFolder = editingFolderId === folderId;
+
+                if (isEditingThisFolder) {
+                  return (
+                    <div 
+                      key={folderId} 
+                      className="p-1.5 bg-slate-100 dark:bg-slate-900 rounded-xl border border-amber-500/40 space-y-1.5"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input 
+                        type="text"
+                        value={editingFolderName}
+                        onChange={(e) => setEditingFolderName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') handleSaveRenameFolder(folderId, e);
+                          if (e.key === 'Escape') setEditingFolderId(null);
+                        }}
+                        autoFocus
+                        className="w-full text-xs bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 border border-slate-300 dark:border-slate-800 rounded-lg p-1.5 focus:outline-none focus:border-amber-500 text-right shadow-xs"
+                      />
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={(e) => handleSaveRenameFolder(folderId, e)}
+                          className="flex-1 py-1 bg-amber-500 text-slate-950 text-[10px] font-bold rounded-md hover:bg-amber-600 cursor-pointer shadow-xs"
+                        >
+                          حفظ
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setEditingFolderId(null)}
+                          className="px-2 py-1 bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] rounded-md hover:bg-slate-300 cursor-pointer"
+                        >
+                          إلغاء
+                        </button>
+                      </div>
                     </div>
-                    <span className="text-[10px] bg-slate-200 dark:bg-slate-900 text-slate-700 dark:text-slate-400 px-1.5 py-0.5 rounded-md font-mono">{count}</span>
-                  </button>
+                  );
+                }
+
+                return (
+                  <div
+                    key={folderId}
+                    onClick={() => setActiveFolder(folderName)}
+                    className={`group/folder w-full flex items-center justify-between text-xs px-3 py-2 rounded-xl transition-all cursor-pointer ${
+                      activeFolder === folderName 
+                        ? 'bg-amber-500/10 text-amber-600 dark:text-amber-500 font-bold border border-amber-500/20' 
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-900'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 truncate max-w-[65%]">
+                      <Folder className="w-4 h-4 text-amber-500 shrink-0" />
+                      <span className="truncate">{folderName}</span>
+                    </div>
+
+                    <div className="flex items-center gap-1 shrink-0">
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono ml-1">{count}</span>
+                      
+                      {/* إظهار زر التعديل والحذف للمجلدات المخصصة فقط عند حوم الماوس */}
+                      {!isSystem && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={(e) => handleStartRenameFolder(folderId, folderName, e)}
+                            className="opacity-0 group-hover/folder:opacity-100 text-slate-500 hover:text-amber-500 p-1 rounded-md hover:bg-amber-500/10 transition-all cursor-pointer"
+                            title="إعادة تسمية المجلد"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isDeleting}
+                            onClick={(e) => handleDeleteFolder(folderId, e)}
+                            className="opacity-0 group-hover/folder:opacity-100 text-red-500 hover:text-red-400 p-1 rounded-md hover:bg-red-500/10 transition-all cursor-pointer"
+                            title="حذف المجلد"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -1146,6 +1329,11 @@ export default function AdminMediaLibrary({
                     
                     <span className="text-slate-500">صيغة الملف</span>
                     <span className="text-slate-800 dark:text-slate-200 text-left font-mono font-bold select-all uppercase">{activeItem.type.split('/').pop() || 'WebP'}</span>
+
+                    <span className="text-slate-500">المجلد الحالي</span>
+                    <span className="text-slate-800 dark:text-slate-200 text-left font-semibold truncate">
+                      {activeItem.folder || 'عام (Root)'}
+                    </span>
 
                     <span className="text-slate-500">تاريخ الرفع</span>
                     <span className="text-slate-800 dark:text-slate-200 text-left truncate" title={formatDate(activeItem.uploadDate)}>{formatDate(activeItem.uploadDate)}</span>

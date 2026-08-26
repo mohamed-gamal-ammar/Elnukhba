@@ -1,4 +1,4 @@
-import { Product, Order, Coupon, SystemSettings, Supplier, SupplierInput, PurchaseOrder, PurchaseOrderInput, PurchaseOrderStatus, CustomerAddress, Campaign, ReturnRequest, ReturnReason, ReturnStatus, RefundStatus } from '../types.js';
+import { Product, Order, Coupon, SystemSettings, Supplier, SupplierInput, PurchaseOrder, PurchaseOrderInput, PurchaseOrderStatus, CustomerAddress, Campaign, ReturnRequest, ReturnReason, ReturnStatus, RefundStatus, MediaFolder, SocialLink } from '../types.js';
 import { ApiError, getFriendlyErrorMessage } from './errorHandler.js';
 
 export { ApiError, getFriendlyErrorMessage };
@@ -19,7 +19,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
       if (adminToken) {
         headers['Authorization'] = `Bearer ${adminToken}`;
       }
-    } else if (path.startsWith('/api/customer') || path.startsWith('/api/auth')) {
+    } else if (path.startsWith('/api/customer') || path.startsWith('/api/auth') || path.startsWith('/api/coupons')) {
       // Strictly Customer token only
       if (customerToken) {
         headers['Authorization'] = `Bearer ${customerToken}`;
@@ -58,6 +58,7 @@ export async function fetchApi<T>(path: string, options?: RequestInit): Promise<
 export const api = {
   // Storefront CMS and taxonomies
   getSettings: () => fetchApi<SystemSettings>('/api/settings'),
+  getSocialLinks: () => fetchApi<SocialLink[]>('/api/social-links'),
   getCategories: () => fetchApi<string[]>('/api/categories'),
   getBrands: () => fetchApi<string[]>('/api/brands'),
 
@@ -140,11 +141,12 @@ export const api = {
     }),
 
   // Coupons & FAQs
-  validateCoupon: (code: string, cartTotal: number, email?: string, phone?: string) => {
+  validateCoupon: (code: string, cartTotal: number, email?: string, phone?: string, customerId?: string) => {
     const params = new URLSearchParams({ code, cartTotal: cartTotal.toString() });
     if (email) params.set('email', email);
     if (phone) params.set('phone', phone);
-    return fetchApi<Coupon & { computedDiscount: number }>(`/api/coupons/validate?${params.toString()}`);
+    if (customerId) params.set('customerId', customerId);
+    return fetchApi<Coupon & { valid: boolean; computedDiscount: number; discountAmount?: number; errorCode?: string }>(`/api/coupons/validate?${params.toString()}`);
   },
 
   getFaqs: () => fetchApi<any[]>('/api/faqs'),
@@ -229,6 +231,28 @@ export const api = {
     fetchApi<SystemSettings>('/api/admin/settings', {
       method: 'PUT',
       body: JSON.stringify(settings)
+    }),
+
+  // Admin Social Links Management
+  getAdminSocialLinks: () => fetchApi<SocialLink[]>('/api/admin/social-links'),
+  createAdminSocialLink: (data: Partial<SocialLink>) =>
+    fetchApi<SocialLink>('/api/admin/social-links', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+  updateAdminSocialLink: (id: string, data: Partial<SocialLink>) =>
+    fetchApi<SocialLink>(`/api/admin/social-links/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    }),
+  deleteAdminSocialLink: (id: string) =>
+    fetchApi<{ success: boolean; id: string }>(`/api/admin/social-links/${encodeURIComponent(id)}`, {
+      method: 'DELETE'
+    }),
+  reorderAdminSocialLinks: (items: { id: string; order: number }[]) =>
+    fetchApi<SocialLink[]>('/api/admin/social-links/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items })
     }),
 
   getAdminNotifications: (params?: {
@@ -438,6 +462,30 @@ export const api = {
       method: 'POST',
       body: JSON.stringify({ ids, folder })
     }),
+
+  getMediaFolders: () =>
+    fetchApi<{ success: boolean; folders: MediaFolder[] }>('/api/admin/media/folders'),
+
+  createMediaFolder: (name: string) =>
+    fetchApi<MediaFolder>('/api/admin/media/folders', {
+      method: 'POST',
+      body: JSON.stringify({ name })
+    }),
+
+  renameMediaFolder: (id: string, name: string) =>
+    fetchApi<{ success: boolean; folder: MediaFolder }>(`/api/admin/media/folders/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name })
+    }),
+
+  deleteMediaFolder: (id: string, options?: { moveToRoot?: boolean }) =>
+    fetchApi<{ success: boolean; id: string; movedCount?: number; blocked?: boolean; itemCount?: number }>(
+      `/api/admin/media/folders/${encodeURIComponent(id)}${options?.moveToRoot ? '?moveToRoot=true' : ''}`,
+      {
+        method: 'DELETE',
+        body: options ? JSON.stringify(options) : undefined
+      }
+    ),
 
   uploadImage: (file: File, onProgress?: (progress: number) => void) => {
     return new Promise<{ success: boolean; url: string }>((resolve, reject) => {

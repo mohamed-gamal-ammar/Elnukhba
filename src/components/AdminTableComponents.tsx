@@ -150,8 +150,9 @@ export const AdminTablePagination: React.FC<AdminTablePaginationProps> = React.m
               value={limit}
               onChange={(val) => onLimitChange(Number(val))}
               size="sm"
+              placement="top"
               buttonClassName="bg-white dark:bg-slate-900 border-slate-300 dark:border-amber-500/20 text-slate-900 dark:text-white rounded-lg px-2 py-0.5 text-xs font-bold"
-              menuClassName="bg-white dark:bg-slate-900 min-w-[70px]"
+              menuClassName="bg-white dark:bg-slate-900 min-w-[70px] shadow-xl"
               options={[
                 { value: '10', label: '10' },
                 { value: '15', label: '15' },

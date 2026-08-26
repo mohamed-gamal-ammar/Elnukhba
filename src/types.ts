@@ -42,21 +42,30 @@ export type StockMovementType =
   | 'out_sale'
   | 'out_damage'
   | 'out_damaged'
-  | 'out_adjustment';
+  | 'out_adjustment'
+  | 'manual_adjustment';
 
 export interface StockMovement {
   id: string;
   productId: string;
   productTitle?: string;
+  productName?: string;
   variantId?: string;
   variantInfo?: string;
   variantSku?: string;
   type: StockMovementType;
+  movementType?: StockMovementType | string;
   quantity: number;
+  quantityDelta: number;
   previousStock: number;
   newStock: number;
   referenceId?: string;
+  referenceType?: string;
   reason?: string;
+  note?: string;
+  performedBy?: string;
+  performedByName?: string;
+  adminId?: string;
   createdBy?: string;
   createdAt: string;
   timestamp?: string;
@@ -68,8 +77,12 @@ export interface AdjustStockParams {
   type: StockMovementType;
   quantity: number;
   referenceId?: string;
+  referenceType?: string;
   reason?: string;
+  note?: string;
   createdBy?: string;
+  adminId?: string;
+  adminName?: string;
 }
 
 export interface Review {
@@ -229,6 +242,8 @@ export interface Order {
     price: number;
   }[];
   couponCode?: string;
+  discountType?: 'percentage' | 'fixed' | 'free_shipping';
+  discountValue?: number;
   appliedCampaignId?: string;
   appliedCampaignName?: string;
   campaignDiscount?: number;
@@ -317,9 +332,11 @@ export interface ReturnRequest {
 }
 
 export interface Coupon {
+  id?: string;
   code: string;
   discountType: 'percentage' | 'fixed' | 'free_shipping';
   value: number; // For percentage or fixed value, 0 for free_shipping
+  discountValue?: number; // Standard alias for value
   minOrderValue?: number;
   maxDiscountAmount?: number; // Cap for percentage discounts
   expiryDate?: string; // YYYY-MM-DD
@@ -329,6 +346,8 @@ export interface Coupon {
   usedByUsers: string[]; // List of customer emails/phones who redeemed this coupon
   totalDiscountGenerated: number; // Analytics total discount EGP generated
   isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ActivityLog {
@@ -356,6 +375,18 @@ export interface Notification {
   metadata?: Record<string, any>;
 }
 
+export interface SocialLink {
+  id: string;
+  name: string;
+  url: string;
+  icon: string;
+  enabled: boolean;
+  order: number;
+  openInNewTab?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface SystemSettings {
   logoText: string;
   logoSubtext: string;
@@ -364,9 +395,10 @@ export interface SystemSettings {
   contactPhone: string;
   contactEmail: string;
   contactAddress: string;
-  socialFacebook: string;
-  socialInstagram: string;
-  socialTwitter: string;
+  socialFacebook?: string;
+  socialInstagram?: string;
+  socialTwitter?: string;
+  socialLinks?: SocialLink[];
   bannerTitle: string;
   bannerSubtitle: string;
   bannerImage: string;
@@ -533,6 +565,14 @@ export interface MediaUsage {
   name: string;
 }
 
+export interface MediaFolder {
+  id: string;
+  name: string;
+  count?: number;
+  isSystem?: boolean;
+  createdAt?: string;
+}
+
 export interface MediaItem {
   id: string;
   filename: string;
@@ -547,6 +587,7 @@ export interface MediaItem {
   uploadDate: string;
   hash: string;
   folder?: string;
+  folderId?: string | null;
   title?: string;
   usedBy?: MediaUsage[];
 }

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
-import { Product, Order, Coupon, ActivityLog, AuditLog, Notification, SystemSettings, FAQ, OrderStatus, Banner, ShippingProvince, Customer, MediaItem, MediaUsage, StockMovement, AdjustStockParams, Supplier, SupplierInput, SupplierStatus, PurchaseOrder, PurchaseOrderItem, PurchaseOrderInput, PurchaseOrderStatus, Review, Role, Permission, AdminUser, RolePermission, AdminPermissionOverride, ReturnRequest, ReturnReason, ReturnStatus, RefundStatus } from '../src/types.js';
+import { Product, Order, Coupon, ActivityLog, AuditLog, Notification, SystemSettings, FAQ, OrderStatus, Banner, ShippingProvince, Customer, MediaItem, MediaFolder, MediaUsage, StockMovement, AdjustStockParams, Supplier, SupplierInput, SupplierStatus, PurchaseOrder, PurchaseOrderItem, PurchaseOrderInput, PurchaseOrderStatus, Review, Role, Permission, AdminUser, RolePermission, AdminPermissionOverride, ReturnRequest, ReturnReason, ReturnStatus, RefundStatus, SocialLink } from '../src/types.js';
 import { assertNumeric, validateBackendNumeric } from './numericValidation.js';
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -36,6 +36,7 @@ export interface DatabaseSchema {
   shippingProvinces: ShippingProvince[];
   customers?: Customer[];
   media?: MediaItem[];
+  folders?: MediaFolder[];
   stockMovements?: StockMovement[];
   suppliers?: Supplier[];
   purchaseOrders?: PurchaseOrder[];
@@ -47,6 +48,7 @@ export interface DatabaseSchema {
   adminUsers?: AdminUser[];
   rolePermissions?: RolePermission[];
   adminPermissionOverrides?: AdminPermissionOverride[];
+  socialLinks?: SocialLink[];
   admin?: {
     email: string;
     passwordHash: string;
@@ -64,6 +66,70 @@ export function sanitizeText(text?: string): string {
     .replace(/javascript\s*:/gi, '')
     .replace(/on\w+\s*=/gi, '')
     .trim();
+}
+
+export function sanitizeSocialLink(input: any, isUpdate = false): Partial<SocialLink> {
+  const result: Partial<SocialLink> = {};
+
+  if (input.name !== undefined) {
+    if (typeof input.name !== 'string' || !input.name.trim()) {
+      throw new Error('اسم منصة التواصل مطلوب');
+    }
+    const cleanName = sanitizeText(input.name);
+    if (!cleanName || cleanName.length > 100) {
+      throw new Error('اسم المنصة يجب أن يكون بين 1 و 100 حرف ولا يحتوي على وسوم غير مسموحة');
+    }
+    result.name = cleanName;
+  } else if (!isUpdate) {
+    throw new Error('اسم منصة التواصل مطلوب');
+  }
+
+  if (input.url !== undefined) {
+    if (typeof input.url !== 'string' || !input.url.trim()) {
+      throw new Error('رابط منصة التواصل مطلوب');
+    }
+    const rawUrl = input.url.trim();
+    // Strict security check: ban javascript:, data:, vbscript:, file:, HTML tags or inline event handlers
+    if (/^(javascript|data|vbscript|file):/i.test(rawUrl) || /<[^>]*>/g.test(rawUrl) || /on\w+\s*=/i.test(rawUrl)) {
+      throw new Error('الرابط المدخل غير صالح أو يحتوي على بروتوكول غير آمن');
+    }
+    let formattedUrl = rawUrl;
+    if (!/^https?:\/\//i.test(formattedUrl) && !/^mailto:/i.test(formattedUrl) && !/^tel:/i.test(formattedUrl)) {
+      if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(formattedUrl)) {
+        formattedUrl = `https://${formattedUrl}`;
+      } else {
+        throw new Error('يرجى إدخال رابط صالح يبدأ بـ https:// أو http://');
+      }
+    }
+    result.url = formattedUrl;
+  } else if (!isUpdate) {
+    throw new Error('رابط منصة التواصل مطلوب');
+  }
+
+  if (input.icon !== undefined) {
+    result.icon = typeof input.icon === 'string' ? sanitizeText(input.icon).toLowerCase() || 'link' : 'link';
+  } else if (!isUpdate) {
+    result.icon = 'link';
+  }
+
+  if (input.enabled !== undefined) {
+    result.enabled = Boolean(input.enabled);
+  } else if (!isUpdate) {
+    result.enabled = true;
+  }
+
+  if (input.order !== undefined) {
+    const parsedOrder = parseInt(String(input.order), 10);
+    result.order = isNaN(parsedOrder) ? 1 : Math.max(1, parsedOrder);
+  }
+
+  if (input.openInNewTab !== undefined) {
+    result.openInNewTab = Boolean(input.openInNewTab);
+  } else if (!isUpdate) {
+    result.openInNewTab = true;
+  }
+
+  return result;
 }
 
 /**
@@ -664,6 +730,42 @@ const seedSettings: SystemSettings = {
   shippingFlatRate: 50
 };
 
+export const seedSocialLinks: SocialLink[] = [
+  {
+    id: 'facebook',
+    name: 'Facebook',
+    url: 'https://facebook.com',
+    icon: 'facebook',
+    enabled: true,
+    order: 1,
+    openInNewTab: true,
+    createdAt: '2026-08-01T00:00:00.000Z',
+    updatedAt: '2026-08-01T00:00:00.000Z'
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram',
+    url: 'https://instagram.com',
+    icon: 'instagram',
+    enabled: true,
+    order: 2,
+    openInNewTab: true,
+    createdAt: '2026-08-01T00:00:00.000Z',
+    updatedAt: '2026-08-01T00:00:00.000Z'
+  },
+  {
+    id: 'twitter',
+    name: 'Twitter',
+    url: 'https://twitter.com',
+    icon: 'twitter',
+    enabled: true,
+    order: 3,
+    openInNewTab: true,
+    createdAt: '2026-08-01T00:00:00.000Z',
+    updatedAt: '2026-08-01T00:00:00.000Z'
+  }
+];
+
 // Seed historical orders to populate charts
 const seedOrders: Order[] = [
   {
@@ -861,6 +963,12 @@ export const seedBanners: Banner[] = [
   }
 ];
 
+export const seedFolders: MediaFolder[] = [
+  { id: 'folder_products', name: 'المنتجات', count: 0, isSystem: true },
+  { id: 'folder_banners', name: 'اللافتات', count: 0, isSystem: true },
+  { id: 'folder_logos', name: 'الشعارات', count: 0, isSystem: true }
+];
+
 export const seedProvinces: ShippingProvince[] = [
   { id: 'prov-1', name: 'القاهرة', nameEn: 'Cairo', price: 50, estimatedDays: '1-2 أيام', isActive: true, isCodAvailable: true, freeShippingThreshold: 5000 },
   { id: 'prov-2', name: 'الجيزة', nameEn: 'Giza', price: 50, estimatedDays: '1-2 أيام', isActive: true, isCodAvailable: true, freeShippingThreshold: 5000 },
@@ -987,7 +1095,8 @@ export const seedPermissions: Permission[] = [
   { id: 'perm-16', key: 'reviews.manage', name: 'إدارة التقييمات', group: 'reviews', module: 'reviews', description: 'الموافقة على التقييمات وتعديلها وحذفها', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' },
   { id: 'perm-17', key: 'media.manage', name: 'إدارة الوسائط', group: 'media', module: 'media', description: 'رفع وإدارة الصور والملفات', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' },
   { id: 'perm-18', key: 'returns.view', name: 'عرض طلبات الإرجاع', group: 'returns', module: 'returns', description: 'عرض قائمة وحالة طلبات الإرجاع', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' },
-  { id: 'perm-19', key: 'returns.manage', name: 'إدارة طلبات الإرجاع', group: 'returns', module: 'returns', description: 'الموافقة أو الرفض وتحديث حالة الإرجاع والاسترداد', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' }
+  { id: 'perm-19', key: 'returns.manage', name: 'إدارة طلبات الإرجاع', group: 'returns', module: 'returns', description: 'الموافقة أو الرفض وتحديث حالة الإرجاع والاسترداد', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' },
+  { id: 'perm-20', key: 'social.manage', name: 'إدارة روابط التواصل', group: 'settings', module: 'settings', description: 'إدارة وتعديل وحذف وإعادة ترتيب منصات التواصل الاجتماعي', isSystem: true, active: true, isDeleted: false, createdAt: '2026-08-01T00:00:00.000Z' }
 ];
 
 export const seedRolePermissions: RolePermission[] = seedPermissions.map((p, idx) => ({
@@ -1062,6 +1171,7 @@ export function initDb(): DatabaseSchema {
       shippingProvinces: seedProvinces,
       customers: [],
       media: [],
+      folders: [...seedFolders],
       stockMovements: [],
       suppliers: seedSuppliers,
       purchaseOrders: [],
@@ -1073,6 +1183,7 @@ export function initDb(): DatabaseSchema {
       adminUsers: seedAdminUsers,
       rolePermissions: seedRolePermissions,
       adminPermissionOverrides: seedAdminPermissionOverrides,
+      socialLinks: seedSocialLinks,
       admin: {
         email: defaultAdmin.email,
         passwordHash: defaultAdmin.hash,
@@ -1175,6 +1286,37 @@ export function initDb(): DatabaseSchema {
     if (!parsed.media) {
       parsed.media = [];
       modified = true;
+    }
+    if (!parsed.folders || parsed.folders.length === 0) {
+      parsed.folders = [...seedFolders];
+      modified = true;
+    } else {
+      // Ensure seedFolders (system folders) are present
+      for (const sysFolder of seedFolders) {
+        if (!parsed.folders.some((f: MediaFolder) => f.id === sysFolder.id || f.name === sysFolder.name)) {
+          parsed.folders.unshift(sysFolder);
+          modified = true;
+        }
+      }
+    }
+    // Normalize media items folderId and folder safely
+    if (parsed.media && Array.isArray(parsed.media)) {
+      parsed.media = parsed.media.map((m: MediaItem) => {
+        if (m.folder && !m.folderId) {
+          const matchingFolder = (parsed.folders as MediaFolder[]).find(f => f.name === m.folder);
+          if (matchingFolder) {
+            m.folderId = matchingFolder.id;
+            modified = true;
+          }
+        } else if (m.folderId && !m.folder) {
+          const matchingFolder = (parsed.folders as MediaFolder[]).find(f => f.id === m.folderId);
+          if (matchingFolder) {
+            m.folder = matchingFolder.name;
+            modified = true;
+          }
+        }
+        return m;
+      });
     }
     if (!parsed.stockMovements) {
       parsed.stockMovements = [];
@@ -1374,22 +1516,91 @@ export function initDb(): DatabaseSchema {
       }
     }
     if (parsed.coupons) {
-      parsed.coupons = parsed.coupons.map(c => {
+      parsed.coupons = parsed.coupons.map((c: any) => {
+        const rawValue = typeof c.value === 'number' ? c.value : (typeof c.discountValue === 'number' ? c.discountValue : 0);
+        const resolvedType = c.discountType || 'fixed';
         const updated = {
           ...c,
-          discountType: c.discountType || 'percentage',
-          value: typeof c.value === 'number' ? c.value : 0,
+          id: c.id || `coupon-${(c.code || '').toLowerCase()}`,
+          discountType: resolvedType,
+          value: rawValue,
+          discountValue: rawValue,
+          minOrderValue: typeof c.minOrderValue === 'number' ? c.minOrderValue : undefined,
+          maxDiscountAmount: typeof c.maxDiscountAmount === 'number' ? c.maxDiscountAmount : undefined,
+          expiryDate: c.expiryDate || undefined,
+          usageLimit: typeof c.usageLimit === 'number' ? c.usageLimit : undefined,
           usedCount: typeof c.usedCount === 'number' ? c.usedCount : 0,
           usedByUsers: Array.isArray(c.usedByUsers) ? c.usedByUsers : [],
           totalDiscountGenerated: typeof c.totalDiscountGenerated === 'number' ? c.totalDiscountGenerated : 0,
           oneUsePerUser: typeof c.oneUsePerUser === 'boolean' ? c.oneUsePerUser : false,
-          isActive: typeof c.isActive === 'boolean' ? c.isActive : true
+          isActive: typeof c.isActive === 'boolean' ? c.isActive : true,
+          createdAt: c.createdAt || new Date().toISOString(),
+          updatedAt: c.updatedAt || new Date().toISOString()
         };
         if (JSON.stringify(updated) !== JSON.stringify(c)) {
           modified = true;
         }
         return updated;
       });
+    }
+    if (!parsed.socialLinks || !Array.isArray(parsed.socialLinks) || parsed.socialLinks.length === 0) {
+      const migrated: SocialLink[] = [];
+      let orderIndex = 1;
+      const now = new Date().toISOString();
+
+      const fbUrl = parsed.settings?.socialFacebook || 'https://facebook.com';
+      migrated.push({
+        id: 'facebook',
+        name: 'Facebook',
+        url: fbUrl,
+        icon: 'facebook',
+        enabled: !!fbUrl,
+        order: orderIndex++,
+        openInNewTab: true,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      const igUrl = parsed.settings?.socialInstagram || 'https://instagram.com';
+      migrated.push({
+        id: 'instagram',
+        name: 'Instagram',
+        url: igUrl,
+        icon: 'instagram',
+        enabled: !!igUrl,
+        order: orderIndex++,
+        openInNewTab: true,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      const twUrl = parsed.settings?.socialTwitter || 'https://twitter.com';
+      migrated.push({
+        id: 'twitter',
+        name: 'Twitter',
+        url: twUrl,
+        icon: 'twitter',
+        enabled: !!twUrl,
+        order: orderIndex++,
+        openInNewTab: true,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      parsed.socialLinks = migrated;
+      modified = true;
+    } else {
+      parsed.socialLinks = parsed.socialLinks.map((s, idx) => ({
+        id: s.id || `social-${Date.now()}-${idx}`,
+        name: s.name || 'منصة تواصل',
+        url: s.url || '',
+        icon: s.icon || 'link',
+        enabled: typeof s.enabled === 'boolean' ? s.enabled : true,
+        order: typeof s.order === 'number' ? s.order : idx + 1,
+        openInNewTab: typeof s.openInNewTab === 'boolean' ? s.openInNewTab : true,
+        createdAt: s.createdAt || new Date().toISOString(),
+        updatedAt: s.updatedAt || new Date().toISOString()
+      }));
     }
     if (modified) {
       fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf-8');
@@ -1409,6 +1620,7 @@ export function initDb(): DatabaseSchema {
       shippingProvinces: seedProvinces,
       customers: [],
       media: [],
+      folders: [...seedFolders],
       stockMovements: [],
       suppliers: seedSuppliers,
       purchaseOrders: [],
@@ -1419,6 +1631,7 @@ export function initDb(): DatabaseSchema {
       adminUsers: seedAdminUsers,
       rolePermissions: seedRolePermissions,
       adminPermissionOverrides: seedAdminPermissionOverrides,
+      socialLinks: seedSocialLinks,
       admin: {
         email: defaultAdmin.email,
         passwordHash: defaultAdmin.hash,
@@ -2315,7 +2528,12 @@ export const db = {
     db.logAction('Admin', 'إضافة منتج جديد', `تمت إضافة المنتج ${product.title} بنجاح`);
     return product;
   },
-  updateProduct: (id: string, updatedFields: Partial<Product>) => {
+  updateProduct: (
+    id: string,
+    updatedFields: Partial<Product> & { stockAdjustmentReason?: string; stockAdjustmentNote?: string },
+    adminInfo?: { adminId?: string; adminName?: string; adminEmail?: string } | string,
+    explicitReason?: string
+  ) => {
     const data = initDb();
     const index = data.products.findIndex(p => p.id === id);
     if (index === -1) return null;
@@ -2400,9 +2618,110 @@ export const db = {
       });
     }
 
-    data.products[index] = { ...data.products[index], ...updatedFields };
+    // -------------------------------------------------------------
+    // ATOMIC INVENTORY LEDGER: Detect and Record Manual Stock Changes
+    // -------------------------------------------------------------
+    const generatedMovements: StockMovement[] = [];
+    const nowIso = new Date().toISOString();
+
+    const adminEmail = typeof adminInfo === 'object' ? adminInfo?.adminEmail : (typeof adminInfo === 'string' ? adminInfo : undefined);
+    const adminName = typeof adminInfo === 'object' ? adminInfo?.adminName : (typeof adminInfo === 'string' ? adminInfo : undefined);
+    const adminId = typeof adminInfo === 'object' ? adminInfo?.adminId : undefined;
+    const actorName = adminName || adminEmail || 'مسؤول النظام';
+
+    const reasonText = explicitReason || updatedFields.stockAdjustmentReason || 'تعديل يدوي للمخزون من لوحة التحكم';
+    const noteText = updatedFields.stockAdjustmentNote || reasonText;
+
+    const hasExistingVariants = existingProduct.variants && existingProduct.variants.length > 0;
+    const hasIncomingVariants = updatedFields.variants && Array.isArray(updatedFields.variants);
+
+    if (hasIncomingVariants && updatedFields.variants) {
+      const existingVariantsMap = new Map((existingProduct.variants || []).map(v => [v.id, v]));
+
+      for (const varItem of updatedFields.variants) {
+        if (!varItem.id) continue;
+        const matchedExisting = existingVariantsMap.get(varItem.id);
+        const prevVarStock = matchedExisting && typeof matchedExisting.stock === 'number' ? matchedExisting.stock : 0;
+        const newVarStock = typeof varItem.stock === 'number' ? varItem.stock : prevVarStock;
+
+        if (matchedExisting && newVarStock !== prevVarStock) {
+          const delta = newVarStock - prevVarStock;
+          const parts = [
+            varItem.size,
+            varItem.color,
+            varItem.capacity,
+            varItem.sku ? `SKU: ${varItem.sku}` : ''
+          ].filter(Boolean);
+          const varInfo = parts.join(' / ') || `موديل #${varItem.id}`;
+
+          generatedMovements.push({
+            id: 'sm_' + crypto.randomBytes(8).toString('hex'),
+            productId: existingProduct.id,
+            productTitle: existingProduct.title,
+            productName: existingProduct.title,
+            variantId: varItem.id,
+            variantInfo: varInfo,
+            variantSku: varItem.sku || matchedExisting.sku,
+            type: delta > 0 ? 'in_adjustment' : 'out_adjustment',
+            movementType: 'manual_adjustment',
+            quantity: Math.abs(delta),
+            quantityDelta: delta,
+            previousStock: prevVarStock,
+            newStock: newVarStock,
+            reason: reasonText,
+            note: noteText,
+            performedBy: adminId || actorName,
+            performedByName: actorName,
+            adminId: adminId,
+            createdBy: actorName,
+            createdAt: nowIso,
+            timestamp: nowIso
+          });
+        }
+      }
+
+      // Automatically recalculate parent stock from variant stocks
+      updatedFields.stock = updatedFields.variants.reduce((sum, v) => sum + (typeof v.stock === 'number' ? v.stock : 0), 0);
+    } else if (updatedFields.stock !== undefined && !hasExistingVariants) {
+      const prevStock = typeof existingProduct.stock === 'number' ? existingProduct.stock : 0;
+      const newStock = updatedFields.stock;
+
+      if (newStock !== prevStock) {
+        const delta = newStock - prevStock;
+        generatedMovements.push({
+          id: 'sm_' + crypto.randomBytes(8).toString('hex'),
+          productId: existingProduct.id,
+          productTitle: existingProduct.title,
+          productName: existingProduct.title,
+          type: delta > 0 ? 'in_adjustment' : 'out_adjustment',
+          movementType: 'manual_adjustment',
+          quantity: Math.abs(delta),
+          quantityDelta: delta,
+          previousStock: prevStock,
+          newStock: newStock,
+          reason: reasonText,
+          note: noteText,
+          performedBy: adminId || actorName,
+          performedByName: actorName,
+          adminId: adminId,
+          createdBy: actorName,
+          createdAt: nowIso,
+          timestamp: nowIso
+        });
+      }
+    }
+
+    // Clean internal temporary fields from product payload
+    const { stockAdjustmentReason, stockAdjustmentNote, ...cleanFields } = updatedFields;
+
+    data.products[index] = { ...data.products[index], ...cleanFields };
+    if (generatedMovements.length > 0) {
+      data.stockMovements = data.stockMovements || [];
+      data.stockMovements.unshift(...generatedMovements);
+    }
+
     saveDb(data);
-    db.logAction('Admin', 'تعديل منتج', `تم تعديل مواصفات المنتج: ${data.products[index].title}`);
+    db.logAction('Admin', 'تعديل منتج', `تم تعديل مواصفات المنتج: ${data.products[index].title}${generatedMovements.length > 0 ? ` (تم توثيق ${generatedMovements.length} حركة جرد مخزنية)` : ''}`);
     return data.products[index];
   },
   deleteProduct: (id: string) => {
@@ -2833,14 +3152,24 @@ export const db = {
       throw new Error('كود الكوبون هذا موجود بالفعل مسبقاً');
     }
 
-    // Strict Numeric Assertions
-    if (coupon.discountType === 'percentage') {
-      coupon.value = assertNumeric(coupon.value, 'percentage', { required: true, fieldNameArabic: 'نسبة الخصم' })!;
-    } else if (coupon.discountType === 'fixed') {
-      coupon.value = assertNumeric(coupon.value, 'positive_decimal', { required: true, fieldNameArabic: 'قيمة الخصم الثابت' })!;
+    const rawVal = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
+    const resolvedType = coupon.discountType || 'fixed';
+
+    let sanitizedValue = 0;
+    if (resolvedType === 'percentage') {
+      sanitizedValue = assertNumeric(rawVal, 'percentage', { required: true, min: 0.01, max: 100, fieldNameArabic: 'نسبة الخصم' })!;
+    } else if (resolvedType === 'fixed') {
+      sanitizedValue = assertNumeric(rawVal, 'positive_decimal', { required: true, min: 0.01, fieldNameArabic: 'قيمة الخصم الثابت' })!;
     } else {
-      coupon.value = assertNumeric(coupon.value ?? 0, 'non_negative_decimal', { fieldNameArabic: 'قيمة الخصم' })!;
+      sanitizedValue = 0;
     }
+
+    coupon.discountType = resolvedType;
+    coupon.value = sanitizedValue;
+    coupon.discountValue = sanitizedValue;
+    coupon.id = coupon.id || `coupon-${coupon.code.toLowerCase()}`;
+    coupon.createdAt = coupon.createdAt || new Date().toISOString();
+    coupon.updatedAt = new Date().toISOString();
 
     if (coupon.minOrderValue !== undefined && coupon.minOrderValue !== null) {
       coupon.minOrderValue = assertNumeric(coupon.minOrderValue, 'non_negative_decimal', { fieldNameArabic: 'الحد الأدنى لقيمة الطلب' });
@@ -2867,14 +3196,37 @@ export const db = {
       throw new Error('الكوبون غير موجود');
     }
 
-    const effectiveType = updatedFields.discountType || data.coupons[index].discountType;
-    if (updatedFields.value !== undefined) {
+    const effectiveType = updatedFields.discountType || data.coupons[index].discountType || 'fixed';
+    const hasValueUpdate = updatedFields.value !== undefined || updatedFields.discountValue !== undefined;
+    
+    if (hasValueUpdate) {
+      const rawVal = updatedFields.value !== undefined ? updatedFields.value : updatedFields.discountValue;
       if (effectiveType === 'percentage') {
-        updatedFields.value = assertNumeric(updatedFields.value, 'percentage', { required: true, fieldNameArabic: 'نسبة الخصم' })!;
+        const sanitized = assertNumeric(rawVal, 'percentage', { required: true, min: 0.01, max: 100, fieldNameArabic: 'نسبة الخصم' })!;
+        updatedFields.value = sanitized;
+        updatedFields.discountValue = sanitized;
       } else if (effectiveType === 'fixed') {
-        updatedFields.value = assertNumeric(updatedFields.value, 'positive_decimal', { required: true, fieldNameArabic: 'قيمة الخصم الثابت' })!;
+        const sanitized = assertNumeric(rawVal, 'positive_decimal', { required: true, min: 0.01, fieldNameArabic: 'قيمة الخصم الثابت' })!;
+        updatedFields.value = sanitized;
+        updatedFields.discountValue = sanitized;
       } else {
-        updatedFields.value = assertNumeric(updatedFields.value, 'non_negative_decimal', { fieldNameArabic: 'قيمة الخصم' })!;
+        updatedFields.value = 0;
+        updatedFields.discountValue = 0;
+      }
+    } else if (updatedFields.discountType && updatedFields.discountType !== data.coupons[index].discountType) {
+      // Re-validate existing value against new discount type
+      const currentVal = data.coupons[index].value;
+      if (updatedFields.discountType === 'percentage') {
+        const sanitized = assertNumeric(currentVal, 'percentage', { required: true, min: 0.01, max: 100, fieldNameArabic: 'نسبة الخصم' })!;
+        updatedFields.value = sanitized;
+        updatedFields.discountValue = sanitized;
+      } else if (updatedFields.discountType === 'fixed') {
+        const sanitized = assertNumeric(currentVal, 'positive_decimal', { required: true, min: 0.01, fieldNameArabic: 'قيمة الخصم الثابت' })!;
+        updatedFields.value = sanitized;
+        updatedFields.discountValue = sanitized;
+      } else {
+        updatedFields.value = 0;
+        updatedFields.discountValue = 0;
       }
     }
 
@@ -2891,6 +3243,7 @@ export const db = {
       updatedFields.usedCount = assertNumeric(updatedFields.usedCount, 'non_negative_integer', { fieldNameArabic: 'عدد مرات الاستخدام' });
     }
 
+    updatedFields.updatedAt = new Date().toISOString();
     data.coupons[index] = { ...data.coupons[index], ...updatedFields };
     saveDb(data);
     db.logAction('Admin', 'تعديل كوبون خصم', `تم تعديل إعدادات الكوبون [${code}]`);
@@ -3398,7 +3751,11 @@ export const db = {
   },
   getSettings: () => {
     const data = initDb();
-    return data.settings;
+    const socialLinks = [...(data.socialLinks || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+    return {
+      ...data.settings,
+      socialLinks
+    };
   },
   updateSettings: (newSettings: Partial<SystemSettings>) => {
     const data = initDb();
@@ -3647,6 +4004,106 @@ export const db = {
     return true;
   },
 
+  getMediaFolders: () => {
+    const data = initDb();
+    return data.folders || [...seedFolders];
+  },
+
+  getMediaFolderById: (idOrName: string) => {
+    const data = initDb();
+    const folders = data.folders || [...seedFolders];
+    return folders.find(f => f.id === idOrName || f.name === idOrName) || null;
+  },
+
+  addMediaFolder: (folder: MediaFolder) => {
+    const data = initDb();
+    data.folders = data.folders || [...seedFolders];
+    data.folders.push(folder);
+    saveDb(data);
+    db.logAction('Admin', 'إنشاء مجلد وسائط', `تم إنشاء مجلد جديد باسم: ${folder.name}`);
+    return folder;
+  },
+
+  renameMediaFolder: (idOrName: string, newName: string) => {
+    const data = initDb();
+    data.folders = data.folders || [...seedFolders];
+    const targetFolder = data.folders.find(f => f.id === idOrName || f.name === idOrName);
+    if (!targetFolder) {
+      return { success: false, message: 'المجلد غير موجود' };
+    }
+    if (targetFolder.isSystem) {
+      throw new Error('لا يمكن إعادة تسمية المجلدات النظامية');
+    }
+
+    const trimmed = newName.trim();
+    if (!trimmed) {
+      throw new Error('اسم المجلد لا يمكن أن يكون فارغاً');
+    }
+
+    const duplicate = data.folders.find(f => f.id !== targetFolder.id && f.name.toLowerCase() === trimmed.toLowerCase());
+    if (duplicate) {
+      throw new Error('يوجد مجلد آخر بنفس هذا الاسم');
+    }
+
+    const oldName = targetFolder.name;
+    targetFolder.name = trimmed;
+
+    // Update media items referencing this folder name
+    if (data.media) {
+      data.media = data.media.map(m => {
+        if (m.folderId === targetFolder.id || m.folder === oldName) {
+          return { ...m, folderId: targetFolder.id, folder: trimmed };
+        }
+        return m;
+      });
+    }
+
+    saveDb(data);
+    db.logAction('Admin', 'تعديل اسم مجلد وسائط', `تم تغيير اسم المجلد من "${oldName}" إلى "${trimmed}"`);
+    return { success: true, folder: targetFolder };
+  },
+
+  deleteMediaFolder: (idOrName: string, options?: { moveToRoot?: boolean }) => {
+    const data = initDb();
+    data.folders = data.folders || [...seedFolders];
+    const targetFolder = data.folders.find(f => f.id === idOrName || f.name === idOrName);
+    if (!targetFolder) {
+      return { success: false, message: 'المجلد غير موجود' };
+    }
+    if (targetFolder.isSystem) {
+      throw new Error('لا يمكن حذف المجلدات النظامية');
+    }
+    const folderId = targetFolder.id;
+    const folderName = targetFolder.name;
+
+    // Check count of items in this folder
+    const mediaInFolder = (data.media || []).filter(m => m.folderId === folderId || m.folder === folderName);
+    if (mediaInFolder.length > 0 && !options?.moveToRoot) {
+      return {
+        success: false,
+        blocked: true,
+        itemCount: mediaInFolder.length,
+        message: `المجلد يحتوي على ${mediaInFolder.length} ملف/ملفات. يرجى نقل الصور إلى الرئيسي (Root) أولاً قبل حذف المجلد.`
+      };
+    }
+
+    data.folders = data.folders.filter(f => f.id !== folderId && f.name !== folderName);
+    
+    // Move images to root (folderId: null, folder: '') without deleting any physical files from /uploads
+    if (data.media) {
+      data.media = data.media.map(m => {
+        if (m.folderId === folderId || m.folder === folderName) {
+          return { ...m, folderId: null, folder: '' };
+        }
+        return m;
+      });
+    }
+    
+    saveDb(data);
+    db.logAction('Admin', 'حذف مجلد وسائط', `تم حذف مجلد الوسائط: ${folderName} (تم نقل ${mediaInFolder.length} ملف إلى الجذر)`);
+    return { success: true, id: folderId, movedCount: mediaInFolder.length };
+  },
+
   getStockMovements: (filter?: { productId?: string; variantId?: string; type?: string }) => {
     const data = initDb();
     let movements = data.stockMovements || [];
@@ -3679,14 +4136,14 @@ export const db = {
   },
 
   adjustStock: (params: AdjustStockParams): { product: Product; movement: StockMovement } => {
-    const { productId, variantId, type, quantity: rawQuantity, referenceId, reason, createdBy } = params;
+    const { productId, variantId, type, quantity: rawQuantity, referenceId, referenceType, reason, note, createdBy, adminId, adminName } = params;
 
     const quantity = assertNumeric(rawQuantity, 'positive_integer', { required: true, min: 1, fieldNameArabic: 'كمية تعديل المخزون' })!;
 
     const isIncrement = ['in_purchase', 'in_adjustment', 'in_return'].includes(type);
-    const isDecrement = ['out_sale', 'out_damage', 'out_adjustment'].includes(type);
+    const isDecrement = ['out_sale', 'out_damage', 'out_damaged', 'out_adjustment'].includes(type);
 
-    if (!isIncrement && !isDecrement) {
+    if (!isIncrement && !isDecrement && type !== 'manual_adjustment') {
       throw new Error(`نوع حركة المخزون غير صالحة: ${type}`);
     }
 
@@ -3700,6 +4157,7 @@ export const db = {
     let previousStock = 0;
     let newStock = 0;
     let variantInfo = '';
+    let variantSku = '';
 
     const qtyChange = isIncrement ? Math.round(quantity) : -Math.round(quantity);
 
@@ -3735,6 +4193,7 @@ export const db = {
         variant.sku ? `SKU: ${variant.sku}` : ''
       ].filter(Boolean);
       variantInfo = parts.join(' / ') || `موديل #${variantId}`;
+      variantSku = variant.sku || '';
     } else {
       if (product.variants && product.variants.length > 0) {
         throw new Error('هذا المنتج يحتوي على موديلات متعددة، يرجى تحديد الموديل المطلوب تعديل مخزونه.');
@@ -3750,21 +4209,35 @@ export const db = {
       product.stock = newStock;
     }
 
+    const actor = adminName || createdBy || 'مسؤول النظام';
+    const reasonText = reason || 'تعديل يدوي للمخزون';
+    const noteText = note || reasonText;
+    const nowIso = new Date().toISOString();
+
     const movement: StockMovement = {
       id: 'sm_' + crypto.randomBytes(8).toString('hex'),
       productId: product.id,
       productTitle: product.title,
+      productName: product.title,
       variantId: variantId || undefined,
       variantInfo: variantInfo || undefined,
+      variantSku: variantSku || undefined,
       type,
+      movementType: type,
       quantity: Math.round(quantity),
+      quantityDelta: qtyChange,
       previousStock,
       newStock,
       referenceId: referenceId || undefined,
-      reason: reason || undefined,
-      createdBy: createdBy || 'النظام',
-      createdAt: new Date().toISOString(),
-      timestamp: new Date().toISOString()
+      referenceType: referenceType || (referenceId ? 'ref' : undefined),
+      reason: reasonText,
+      note: noteText,
+      performedBy: adminId || actor,
+      performedByName: actor,
+      adminId: adminId || undefined,
+      createdBy: actor,
+      createdAt: nowIso,
+      timestamp: nowIso
     };
 
     data.products[productIndex] = product;
@@ -5619,6 +6092,131 @@ export const db = {
       topReturnedProducts,
       recentReturns: filteredReturns.slice(0, 5)
     };
+  },
+
+  getSocialLinks: () => {
+    const data = initDb();
+    const list = data.socialLinks || [];
+    return [...list].sort((a, b) => (a.order || 0) - (b.order || 0));
+  },
+
+  getPublicSocialLinks: () => {
+    const data = initDb();
+    const list = data.socialLinks || [];
+    return list
+      .filter(item => item.enabled === true)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
+  },
+
+  getSocialLinkById: (id: string) => {
+    const data = initDb();
+    return (data.socialLinks || []).find(s => s.id === id) || null;
+  },
+
+  addSocialLink: (payload: Partial<SocialLink>) => {
+    const data = initDb();
+    data.socialLinks = data.socialLinks || [];
+
+    const validated = sanitizeSocialLink(payload, false);
+
+    let newId = (payload.id && typeof payload.id === 'string' && payload.id.trim())
+      ? payload.id.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-')
+      : validated.name!.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-');
+
+    if (!newId || data.socialLinks.some(s => s.id === newId)) {
+      newId = `social-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    }
+
+    const maxOrder = data.socialLinks.reduce((max, s) => Math.max(max, s.order || 0), 0);
+    const order = validated.order !== undefined ? validated.order : maxOrder + 1;
+
+    const newLink: SocialLink = {
+      id: newId,
+      name: validated.name!,
+      url: validated.url!,
+      icon: validated.icon || 'link',
+      enabled: validated.enabled !== undefined ? validated.enabled : true,
+      order: order,
+      openInNewTab: validated.openInNewTab !== undefined ? validated.openInNewTab : true,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    data.socialLinks.push(newLink);
+    saveDb(data);
+    db.logAction('Admin', 'إضافة رابط تواصل اجتماعي', `تمت إضافة منصة: ${newLink.name} (${newLink.url})`);
+    return newLink;
+  },
+
+  updateSocialLink: (id: string, updates: Partial<SocialLink>) => {
+    const data = initDb();
+    data.socialLinks = data.socialLinks || [];
+    const index = data.socialLinks.findIndex(s => s.id === id);
+    if (index === -1) {
+      throw new Error('منصة التواصل الاجتماعي غير موجودة');
+    }
+
+    const validated = sanitizeSocialLink(updates, true);
+    const existing = data.socialLinks[index];
+
+    const updated: SocialLink = {
+      ...existing,
+      ...validated,
+      id: existing.id,
+      updatedAt: new Date().toISOString()
+    };
+
+    data.socialLinks[index] = updated;
+    saveDb(data);
+    db.logAction('Admin', 'تعديل رابط تواصل اجتماعي', `تم تحديث منصة: ${updated.name}`);
+    return updated;
+  },
+
+  deleteSocialLink: (id: string) => {
+    const data = initDb();
+    data.socialLinks = data.socialLinks || [];
+    const target = data.socialLinks.find(s => s.id === id);
+    if (!target) {
+      throw new Error('منصة التواصل الاجتماعي غير موجودة');
+    }
+
+    data.socialLinks = data.socialLinks.filter(s => s.id !== id);
+    saveDb(data);
+    db.logAction('Admin', 'حذف رابط تواصل اجتماعي', `تم حذف منصة: ${target.name}`);
+    return { success: true, id };
+  },
+
+  reorderSocialLinks: (items: { id: string; order: number }[]) => {
+    const data = initDb();
+    data.socialLinks = data.socialLinks || [];
+
+    if (!Array.isArray(items)) {
+      throw new Error('بيانات الترتيب غير صالحة');
+    }
+
+    const orderMap = new Map<string, number>();
+    items.forEach(item => {
+      if (item.id && typeof item.order === 'number') {
+        orderMap.set(item.id, item.order);
+      }
+    });
+
+    data.socialLinks = data.socialLinks.map(s => {
+      if (orderMap.has(s.id)) {
+        return {
+          ...s,
+          order: orderMap.get(s.id)!,
+          updatedAt: new Date().toISOString()
+        };
+      }
+      return s;
+    });
+
+    data.socialLinks.sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    saveDb(data);
+    db.logAction('Admin', 'إعادة ترتيب روابط التواصل', 'تم تحديث ترتيب منصات التواصل الاجتماعي');
+    return data.socialLinks;
   }
 
 };

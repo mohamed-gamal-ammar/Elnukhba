@@ -32,6 +32,8 @@ export interface CustomSelectProps {
   icon?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
   dir?: 'rtl' | 'ltr';
+  placement?: 'bottom' | 'top' | 'auto';
+  align?: 'start' | 'end';
   clearable?: boolean;
   onClear?: () => void;
 }
@@ -58,6 +60,8 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   icon,
   size = 'md',
   dir = 'rtl',
+  placement = 'auto',
+  align = 'start',
   clearable = false,
   onClear,
 }) => {
@@ -84,6 +88,36 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const listboxRef = useRef<HTMLDivElement>(null);
+
+  // Dynamic placement detection (top vs bottom)
+  const [resolvedPlacement, setResolvedPlacement] = useState<'top' | 'bottom'>(
+    placement === 'top' ? 'top' : 'bottom'
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+    if (placement === 'top') {
+      setResolvedPlacement('top');
+      return;
+    }
+    if (placement === 'bottom') {
+      setResolvedPlacement('bottom');
+      return;
+    }
+    // Auto detection based on viewport boundary
+    if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const estimatedDropdownHeight = 240;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const spaceAbove = rect.top;
+
+      if (spaceBelow < estimatedDropdownHeight && spaceAbove > spaceBelow) {
+        setResolvedPlacement('top');
+      } else {
+        setResolvedPlacement('bottom');
+      }
+    }
+  }, [isOpen, placement]);
 
   // Sync internal value when controlled value prop changes
   useEffect(() => {
@@ -315,7 +349,19 @@ export const CustomSelect: React.FC<CustomSelectProps> = ({
       {/* Dropdown Menu Popover */}
       {isOpen && (
         <div
-          className={`absolute z-50 mt-1.5 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-amber-500/20 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md transition-all animate-in fade-in-50 zoom-in-95 duration-150 ${menuClassName}`}
+          className={`absolute z-50 ${
+            resolvedPlacement === 'top'
+              ? 'bottom-full mb-1.5 origin-bottom'
+              : 'top-full mt-1.5 origin-top'
+          } ${
+            align === 'end'
+              ? dir === 'rtl'
+                ? 'left-0'
+                : 'right-0'
+              : dir === 'rtl'
+              ? 'right-0'
+              : 'left-0'
+          } min-w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-amber-500/20 rounded-2xl shadow-2xl overflow-hidden backdrop-blur-md transition-all animate-in fade-in-50 zoom-in-95 duration-150 ${menuClassName}`}
           style={{ maxHeight: '320px' }}
         >
           {/* Optional Search Input */}

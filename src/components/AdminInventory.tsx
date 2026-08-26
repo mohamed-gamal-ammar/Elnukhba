@@ -454,18 +454,20 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
   const renderMovementTypeBadge = (type: StockMovementType) => {
     switch (type) {
       case 'in_purchase':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 inline-flex items-center gap-1"><ArrowUpRight className="w-3 h-3" /> توريد / شراء</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 inline-flex items-center gap-1"><ArrowUpRight className="w-3 h-3" /> توريد / شراء</span>;
       case 'in_adjustment':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/10 text-teal-400 border border-teal-500/20 inline-flex items-center gap-1"><Plus className="w-3 h-3" /> تسوية (+)</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/10 text-teal-600 dark:text-teal-400 border border-teal-500/20 inline-flex items-center gap-1"><Plus className="w-3 h-3" /> تسوية (+)</span>;
       case 'in_return':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/10 text-sky-400 border border-sky-500/20 inline-flex items-center gap-1"><RefreshCw className="w-3 h-3" /> مرتجع طلب</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20 inline-flex items-center gap-1"><RefreshCw className="w-3 h-3" /> مرتجع طلب</span>;
       case 'out_sale':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 inline-flex items-center gap-1"><ArrowDownRight className="w-3 h-3" /> مبيعات طلب</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 inline-flex items-center gap-1"><ArrowDownRight className="w-3 h-3" /> مبيعات طلب</span>;
       case 'out_adjustment':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20 inline-flex items-center gap-1"><Minus className="w-3 h-3" /> تسوية (-)</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 inline-flex items-center gap-1"><Minus className="w-3 h-3" /> تسوية (-)</span>;
       case 'out_damage':
       case 'out_damaged':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-600/20 text-red-400 border border-red-500/30 inline-flex items-center gap-1"><ShieldAlert className="w-3 h-3" /> تالف / مفقود</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-600/20 text-red-600 dark:text-red-400 border border-red-500/30 inline-flex items-center gap-1"><ShieldAlert className="w-3 h-3" /> تالف / مفقود</span>;
+      case 'manual_adjustment':
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20 inline-flex items-center gap-1"><Sliders className="w-3 h-3" /> تعديل يدوي</span>;
       default:
         return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-800 text-slate-300">{type}</span>;
     }
@@ -1064,7 +1066,8 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                   { value: 'in_return', label: 'مرتجع طلب عميل (In Return)' },
                   { value: 'out_sale', label: 'مبيعات طلب (Out Sale)' },
                   { value: 'out_adjustment', label: 'تسوية بالسلب (Out Adjustment)' },
-                  { value: 'out_damaged', label: 'تالف / مفقود (Out Damaged)' }
+                  { value: 'out_damaged', label: 'تالف / مفقود (Out Damaged)' },
+                  { value: 'manual_adjustment', label: 'تعديل يدوي (Manual Adjustment)' }
                 ]}
               />
 
@@ -1106,7 +1109,9 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
                     {movements.map((m) => {
-                      const isAddition = m.type.startsWith('in_');
+                      const delta = m.quantityDelta !== undefined ? m.quantityDelta : (m.type.startsWith('in_') ? m.quantity : -m.quantity);
+                      const isAddition = delta > 0;
+                      const actor = m.performedByName || m.performedBy || m.createdBy || 'النظام';
                       return (
                         <tr key={m.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                           <td className="p-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
@@ -1114,10 +1119,15 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className="p-3.5 font-bold text-slate-900 dark:text-white">
-                            <div>{m.productTitle || m.productId}</div>
+                            <div>{m.productTitle || m.productName || m.productId}</div>
+                            {m.variantInfo && (
+                              <div className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
+                                {m.variantInfo}
+                              </div>
+                            )}
                             {m.variantSku && (
                               <div className="text-[10px] text-amber-600 dark:text-amber-400 font-mono">
-                                موديل SKU: {m.variantSku}
+                                SKU: {m.variantSku}
                               </div>
                             )}
                           </td>
@@ -1127,7 +1137,7 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className={`p-3.5 font-mono font-bold text-sm ${isAddition ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
-                            {isAddition ? `+${m.quantity}` : `-${m.quantity}`}
+                            {isAddition ? `+${Math.abs(delta)}` : `-${Math.abs(delta)}`}
                           </td>
 
                           <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300">
@@ -1137,7 +1147,7 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className="p-3.5 text-slate-600 dark:text-slate-300 max-w-xs truncate">
-                            {m.reason}
+                            {m.reason || m.note || '--'}
                           </td>
 
                           <td className="p-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
@@ -1145,7 +1155,7 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className="p-3.5 text-slate-500 dark:text-slate-400 text-[11px]">
-                            {m.createdBy}
+                            {actor}
                           </td>
                         </tr>
                       );
@@ -1448,6 +1458,28 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                   placeholder="مثال: توريد شحنة جديدة، تلف أثناء الشحن، عجز جردي..."
                   className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 placeholder:text-slate-400 dark:placeholder:text-slate-600 shadow-sm"
                 />
+
+                {/* Quick preset reasons */}
+                <div className="flex flex-wrap gap-1.5 mt-1">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 self-center font-bold">أسباب شائعة:</span>
+                  {[
+                    'استلام شحنة جديدة',
+                    'تصحيح جرد',
+                    'تالف',
+                    'خطأ إدخال',
+                    'مرتجع',
+                    'تسوية مخزنية'
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setAdjustReason(preset)}
+                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${adjustReason === preset ? 'bg-amber-500/20 border-amber-500/50 text-amber-700 dark:text-amber-300 font-bold' : 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'}`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Reference ID optional */}

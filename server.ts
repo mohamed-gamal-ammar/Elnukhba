@@ -208,6 +208,16 @@ async function startServer() {
     }
   });
 
+  // Get active social media links (public API)
+  app.get('/api/social-links', (req, res) => {
+    try {
+      const links = db.getPublicSocialLinks();
+      res.json(links);
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to retrieve social links', message: err.message });
+    }
+  });
+
   // Get all active categories (cached for 60 seconds)
   app.get('/api/categories', routeCache(60), (req, res) => {
     try {
@@ -493,51 +503,131 @@ async function startServer() {
     }
   });
 
+  // Customer Sessions Store
+  const customerSessions = new Map<string, { customerId: string; expiresAt: number; rememberMe?: boolean }>();
+
+  // In-memory idempotency cache for order creations
+  const orderIdempotencyCache = new Map<string, { order: Order; timestamp: number }>();
+
+  // Helper to invalidate all sessions for a customer
+  const invalidateCustomerSessions = (customerId: string) => {
+    for (const [token, session] of customerSessions.entries()) {
+      if (session.customerId === customerId) {
+        customerSessions.delete(token);
+      }
+    }
+  };
+
   // Validate discount coupon
   app.get('/api/coupons/validate', (req, res) => {
     try {
-      const { code, cartTotal, email, phone, governorate } = req.query;
-      if (!code) {
-        return res.status(400).json({ error: 'كود الكوبون مطلوب' });
+      const { code, cartTotal, email, phone, customerId, governorate } = req.query;
+      if (!code || typeof code !== 'string' || !code.trim()) {
+        return res.status(400).json({
+          valid: false,
+          errorCode: 'COUPON_INVALID',
+          error: 'كود الكوبون مطلوب',
+          message: 'كود الكوبون مطلوب'
+        });
       }
 
+      const cleanCode = code.trim().toUpperCase();
       const coupons = db.getCoupons();
-      const coupon = coupons.find(c => c.code.toUpperCase() === (code as string).toUpperCase());
+      const coupon = coupons.find(c => c.code.toUpperCase() === cleanCode);
 
       if (!coupon) {
-        return res.status(404).json({ error: 'الكوبون المدخل غير صحيح' });
+        return res.status(404).json({
+          valid: false,
+          errorCode: 'COUPON_NOT_FOUND',
+          error: 'الكوبون المدخل غير صحيح',
+          message: 'الكوبون المدخل غير صحيح'
+        });
       }
 
       if (!coupon.isActive) {
-        return res.status(400).json({ error: 'هذا الكوبون غير فعال حالياً' });
+        return res.status(400).json({
+          valid: false,
+          errorCode: 'COUPON_DISABLED',
+          error: 'هذا الكوبون غير فعال حالياً',
+          message: 'هذا الكوبون غير فعال حالياً'
+        });
       }
 
       // Check Expiry Date
       if (coupon.expiryDate) {
         const todayStr = new Date().toISOString().split('T')[0];
         if (todayStr > coupon.expiryDate) {
-          return res.status(400).json({ error: 'عذراً، هذا الكوبون منتهي الصلاحية' });
+          return res.status(400).json({
+            valid: false,
+            errorCode: 'COUPON_EXPIRED',
+            error: 'عذراً، هذا الكوبون منتهي الصلاحية',
+            message: 'عذراً، هذا الكوبون منتهي الصلاحية'
+          });
         }
       }
 
-      // Check Usage Limit
+      // Check Usage Limit Globally
       if (typeof coupon.usageLimit === 'number' && coupon.usedCount >= coupon.usageLimit) {
-        return res.status(400).json({ error: 'عذراً، تم الوصول للحد الأقصى لاستخدام هذا الكوبون' });
+        return res.status(400).json({
+          valid: false,
+          errorCode: 'COUPON_USAGE_LIMIT_REACHED',
+          error: 'عذراً، تم الوصول للحد الأقصى لاستخدام هذا الكوبون',
+          message: 'عذراً، تم الوصول للحد الأقصى لاستخدام هذا الكوبون'
+        });
       }
 
-      // Check One User One Time (by email or phone)
-      if (coupon.oneUsePerUser) {
-        const identifiers = [
-          (email as string || '').toLowerCase().trim(),
-          (phone as string || '').trim()
-        ].filter(Boolean);
+      // Extract Customer Identity from Authorization Header Token or Query Params
+      let sessionCustomerId: string | undefined = undefined;
+      let sessionCustomer: any = null;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const session = customerSessions.get(token);
+        if (session && Date.now() <= session.expiresAt) {
+          sessionCustomerId = session.customerId;
+          sessionCustomer = db.getCustomerById(session.customerId);
+        }
+      }
 
-        const alreadyUsed = identifiers.some(id => 
-          coupon.usedByUsers.some(u => u.toLowerCase().trim() === id)
+      const resolvedEmail = (sessionCustomer?.email || (email as string) || '').toLowerCase().trim();
+      const resolvedPhone = (sessionCustomer?.phone || (phone as string) || '').trim();
+      const resolvedCustomerId = (sessionCustomerId || (customerId as string) || sessionCustomer?.id || '').trim();
+
+      const customerIdentifiers = [
+        resolvedCustomerId,
+        resolvedEmail,
+        resolvedPhone
+      ].filter(Boolean);
+
+      // Check Single-Use Per Customer Rule (once per user)
+      if (coupon.oneUsePerUser) {
+        // 1. Check coupon's recorded usedByUsers list
+        const inUsedByUsers = customerIdentifiers.length > 0 && customerIdentifiers.some(id => 
+          (coupon.usedByUsers || []).some(u => u && u.toLowerCase().trim() === id.toLowerCase())
         );
 
-        if (alreadyUsed) {
-          return res.status(400).json({ error: 'لقد قمت باستخدام هذا الكوبون مسبقاً، هذا العرض متاح لمرة واحدة لكل عميل' });
+        // 2. Cross-check against completed past orders in database for airtight security
+        const existingOrders = db.getOrders();
+        const inPastOrders = customerIdentifiers.length > 0 && existingOrders.some(order => {
+          if (!order.couponCode || order.couponCode.toUpperCase() !== cleanCode) return false;
+          if (order.status === 'Cancelled') return false; // Cancelled orders do not block reuse
+          const orderCust: any = order.customer || {};
+          const pastOrderIdentifiers = [
+            order.customerId,
+            order.userId,
+            (orderCust?.email || '').toLowerCase().trim(),
+            (orderCust?.phone || '').trim()
+          ].filter(Boolean);
+          return customerIdentifiers.some(id => pastOrderIdentifiers.some(pId => pId.toLowerCase() === id.toLowerCase()));
+        });
+
+        if (inUsedByUsers || inPastOrders) {
+          return res.status(400).json({
+            valid: false,
+            errorCode: 'COUPON_ALREADY_USED',
+            error: 'لا يمكنك استخدام هذا الكود مرة أخرى، لقد سبق لك استخدامه.',
+            message: 'لا يمكنك استخدام هذا الكود مرة أخرى، لقد سبق لك استخدامه.'
+          });
         }
       }
 
@@ -546,23 +636,35 @@ async function startServer() {
       if (cartTotal !== undefined && cartTotal !== '') {
         const vCartTotal = validateBackendNumeric(cartTotal, 'non_negative_decimal', { fieldNameArabic: 'إجمالي السلة' });
         if (!vCartTotal.isValid) {
-          return res.status(400).json({ error: vCartTotal.error });
+          return res.status(400).json({
+            valid: false,
+            errorCode: 'COUPON_INVALID',
+            error: vCartTotal.error,
+            message: vCartTotal.error
+          });
         }
         totalAmount = vCartTotal.value;
       }
       if (coupon.minOrderValue && totalAmount < coupon.minOrderValue) {
-        return res.status(400).json({ error: `الحد الأدنى لتفعيل هذا الكوبون هو ${coupon.minOrderValue} ج.م` });
+        return res.status(400).json({
+          valid: false,
+          errorCode: 'COUPON_MIN_ORDER_NOT_MET',
+          error: `الحد الأدنى لتفعيل هذا الكوبون هو ${coupon.minOrderValue} ج.م`,
+          message: `الحد الأدنى لتفعيل هذا الكوبون هو ${coupon.minOrderValue} ج.م`
+        });
       }
 
-      // Calculate discount amount for preview
+      // Calculate discount amount for preview (DO NOT consume or increment usage count here)
       let discountAmount = 0;
+      const rawVal = coupon.value ?? coupon.discountValue ?? 0;
       if (coupon.discountType === 'percentage') {
-        discountAmount = (totalAmount * coupon.value) / 100;
+        discountAmount = (totalAmount * rawVal) / 100;
         if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
           discountAmount = coupon.maxDiscountAmount;
         }
+        discountAmount = Math.min(discountAmount, totalAmount);
       } else if (coupon.discountType === 'fixed') {
-        discountAmount = Math.min(coupon.value, totalAmount);
+        discountAmount = Math.min(rawVal, totalAmount);
       } else if (coupon.discountType === 'free_shipping') {
         const settings = db.getSettings();
         let shippingCost = settings.shippingFlatRate;
@@ -576,12 +678,24 @@ async function startServer() {
         discountAmount = shippingCost;
       }
 
+      discountAmount = Math.max(0, Number(discountAmount.toFixed(2)));
+
       res.json({
+        valid: true,
         ...coupon,
-        computedDiscount: Number(discountAmount.toFixed(2))
+        code: coupon.code,
+        discountType: coupon.discountType || 'fixed',
+        discountValue: rawVal,
+        discountAmount,
+        computedDiscount: discountAmount
       });
     } catch (err: any) {
-      res.status(500).json({ error: 'فشل التحقق من الكوبون' });
+      res.status(500).json({
+        valid: false,
+        errorCode: 'COUPON_INVALID',
+        error: 'فشل التحقق من الكوبون',
+        message: 'فشل التحقق من الكوبون'
+      });
     }
   });
 
@@ -635,21 +749,6 @@ async function startServer() {
       res.status(500).json({ error: 'فشل في استعلام الطلب' });
     }
   });
-
-  // Customer Sessions Store
-  const customerSessions = new Map<string, { customerId: string; expiresAt: number; rememberMe?: boolean }>();
-
-  // In-memory idempotency cache for order creations
-  const orderIdempotencyCache = new Map<string, { order: Order; timestamp: number }>();
-
-  // Helper to invalidate all sessions for a customer
-  const invalidateCustomerSessions = (customerId: string) => {
-    for (const [token, session] of customerSessions.entries()) {
-      if (session.customerId === customerId) {
-        customerSessions.delete(token);
-      }
-    }
-  };
 
   // Checkout submit (Cash on Delivery)
   app.post('/api/orders', checkoutRateLimiter, (req, res) => {
@@ -752,6 +851,19 @@ async function startServer() {
         }
       }
 
+      // Check if user is logged in (prior to coupon & cart evaluation)
+      let orderUserId: string | undefined = undefined;
+      let orderCustomerObj: any = null;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        const session = customerSessions.get(token);
+        if (session && Date.now() <= session.expiresAt) {
+          orderUserId = session.customerId;
+          orderCustomerObj = db.getCustomerById(session.customerId);
+        }
+      }
+
       // 1. Authoritative Campaign Pricing Evaluation
       const campaignEval = db.evaluateBestCampaign(normalizedItems, subtotal, shippingCost);
       const bestCampaign = campaignEval.bestCampaign;
@@ -759,11 +871,12 @@ async function startServer() {
 
       // 2. Authoritative Coupon Evaluation
       let couponDiscountAmount = 0;
-      let appliedCoupon = null;
+      let appliedCoupon: any = null;
 
       if (couponCode) {
+        const cleanCouponCode = String(couponCode).trim().toUpperCase();
         const coupons = db.getCoupons();
-        const coupon = coupons.find(c => c.code.toUpperCase() === couponCode.toUpperCase());
+        const coupon = coupons.find(c => c.code.toUpperCase() === cleanCouponCode);
         if (coupon && coupon.isActive) {
           let isValid = true;
 
@@ -780,16 +893,34 @@ async function startServer() {
 
           // Verify One Use Per User
           if (coupon.oneUsePerUser) {
-            const identifiers = [
+            const orderCustomerIdentifiers = [
+              orderUserId,
+              orderCustomerObj?.id,
+              orderCustomerObj?.email,
+              orderCustomerObj?.phone,
               (customer.email || '').toLowerCase().trim(),
               (customer.phone || '').trim()
-            ].filter(Boolean);
+            ].filter(Boolean) as string[];
 
-            const alreadyUsed = identifiers.some(id => 
-              coupon.usedByUsers.some(u => u.toLowerCase().trim() === id)
+            const inUsedByUsers = orderCustomerIdentifiers.some(id => 
+              (coupon.usedByUsers || []).some(u => u && u.toLowerCase().trim() === id.toLowerCase().trim())
             );
 
-            if (alreadyUsed) {
+            const existingOrders = db.getOrders();
+            const inPastOrders = existingOrders.some(pastOrder => {
+              if (!pastOrder.couponCode || pastOrder.couponCode.toUpperCase() !== cleanCouponCode) return false;
+              if (pastOrder.status === 'Cancelled') return false; // Cancelled orders do not block reuse
+              const pastCust: any = pastOrder.customer || {};
+              const pastOrderIdentifiers = [
+                pastOrder.customerId,
+                pastOrder.userId,
+                (pastCust?.email || '').toLowerCase().trim(),
+                (pastCust?.phone || '').trim()
+              ].filter(Boolean) as string[];
+              return orderCustomerIdentifiers.some(id => pastOrderIdentifiers.some(pId => pId.toLowerCase() === id.toLowerCase().trim()));
+            });
+
+            if (inUsedByUsers || inPastOrders) {
               isValid = false;
             }
           }
@@ -800,17 +931,19 @@ async function startServer() {
           }
 
           if (isValid) {
+            const rawDiscountValue = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
             if (coupon.discountType === 'percentage') {
-              couponDiscountAmount = (subtotal * coupon.value) / 100;
+              couponDiscountAmount = (subtotal * rawDiscountValue) / 100;
               if (coupon.maxDiscountAmount && couponDiscountAmount > coupon.maxDiscountAmount) {
                 couponDiscountAmount = coupon.maxDiscountAmount;
               }
+              couponDiscountAmount = Math.min(couponDiscountAmount, subtotal);
             } else if (coupon.discountType === 'fixed') {
-              couponDiscountAmount = Math.min(coupon.value, subtotal);
+              couponDiscountAmount = Math.min(rawDiscountValue, subtotal);
             } else if (coupon.discountType === 'free_shipping') {
               couponDiscountAmount = shippingCost;
             }
-            couponDiscountAmount = Number(couponDiscountAmount.toFixed(2));
+            couponDiscountAmount = Math.max(0, Number(couponDiscountAmount.toFixed(2)));
             appliedCoupon = coupon;
           }
         }
@@ -833,17 +966,6 @@ async function startServer() {
 
       const total = Number(Math.max(0, subtotal + taxAmount + shippingCost - finalDiscountAmount).toFixed(2));
 
-      // Check if user is logged in
-      let orderUserId: string | undefined = undefined;
-      const authHeader = req.headers.authorization;
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
-        const session = customerSessions.get(token);
-        if (session && Date.now() <= session.expiresAt) {
-          orderUserId = session.customerId;
-        }
-      }
-
       const newId = `ORD-${Math.floor(1000 + Math.random() * 9000)}`;
       const newOrder: Order = {
         id: newId,
@@ -854,9 +976,12 @@ async function startServer() {
         customer,
         items: normalizedItems,
         couponCode: finalAppliedCoupon ? finalAppliedCoupon.code : undefined,
+        discountType: finalAppliedCoupon ? (finalAppliedCoupon.discountType || 'fixed') : undefined,
+        discountValue: finalAppliedCoupon ? (finalAppliedCoupon.value ?? finalAppliedCoupon.discountValue ?? 0) : undefined,
         appliedCampaignId: finalAppliedCampaign ? finalAppliedCampaign.id : undefined,
         appliedCampaignName: finalAppliedCampaign ? finalAppliedCampaign.name : undefined,
         campaignDiscount: finalAppliedCampaign ? finalDiscountAmount : undefined,
+        subtotal: Number(subtotal.toFixed(2)),
         discountAmount: finalDiscountAmount,
         shippingCost,
         taxAmount,
@@ -882,23 +1007,26 @@ async function startServer() {
         }
       }
 
-      if (finalAppliedCoupon) {
+      if (finalAppliedCoupon && appliedCoupon) {
         const userIdentifiers = [
+          orderUserId,
+          orderCustomerObj?.email,
+          orderCustomerObj?.phone,
           (customer.email || '').toLowerCase().trim(),
           (customer.phone || '').trim()
-        ].filter(Boolean);
+        ].filter(Boolean) as string[];
 
-        const updatedUsers = [...appliedCoupon.usedByUsers];
+        const updatedUsers = [...(appliedCoupon.usedByUsers || [])];
         userIdentifiers.forEach(id => {
-          if (!updatedUsers.includes(id)) {
+          if (!updatedUsers.some(u => u && u.toLowerCase().trim() === id.toLowerCase().trim())) {
             updatedUsers.push(id);
           }
         });
 
         db.updateCoupon(appliedCoupon.code, {
-          usedCount: appliedCoupon.usedCount + 1,
+          usedCount: (appliedCoupon.usedCount || 0) + 1,
           usedByUsers: updatedUsers,
-          totalDiscountGenerated: Number((appliedCoupon.totalDiscountGenerated + finalDiscountAmount).toFixed(2))
+          totalDiscountGenerated: Number(((appliedCoupon.totalDiscountGenerated || 0) + finalDiscountAmount).toFixed(2))
         });
       }
 
@@ -2843,7 +2971,7 @@ async function startServer() {
   }
 
   // 🛡️ RBAC Enforcement Middleware (Sprint 10 - Strict & Comprehensive)
-  const requirePermission = (permissionKey: string) => {
+  const requirePermission = (permissionKey: string | string[]) => {
     return (req: any, res: any, next: any) => {
       try {
         if (!req.admin || !req.admin.email) {
@@ -2851,6 +2979,7 @@ async function startServer() {
         }
 
         const userEmail = req.admin.email.trim().toLowerCase();
+        const requiredKeys = Array.isArray(permissionKey) ? permissionKey : [permissionKey];
 
         // 1. Main system admin account -> Super Admin bypass
         const sysAdmin = db.getAdmin();
@@ -2867,7 +2996,7 @@ async function startServer() {
         );
 
         if (!currentUser) {
-          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: permissionKey });
+          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: requiredKeys.join(', ') });
         }
 
         // Check if user is active
@@ -2876,13 +3005,13 @@ async function startServer() {
           : (currentUser.isActive !== undefined ? currentUser.isActive : true);
 
         if (!isUserActive) {
-          return res.status(403).json({ error: 'تم تعطيل هذا الحساب الإداري من قبل إدارة النظام', code: 'FORBIDDEN', requiredPermission: permissionKey });
+          return res.status(403).json({ error: 'تم تعطيل هذا الحساب الإداري من قبل إدارة النظام', code: 'FORBIDDEN', requiredPermission: requiredKeys.join(', ') });
         }
 
         // 3. Role check & Super Admin Bypass
         const roleId = currentUser.roleId;
         if (!roleId) {
-          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: permissionKey });
+          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: requiredKeys.join(', ') });
         }
 
         if (roleId === 'role-super-admin') {
@@ -2891,7 +3020,7 @@ async function startServer() {
 
         const role = db.getRoleById(roleId);
         if (!role || role.isDeleted || role.active === false) {
-          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: permissionKey });
+          return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: requiredKeys.join(', ') });
         }
 
         if (
@@ -2910,19 +3039,19 @@ async function startServer() {
         const rolePermissions = db.getRolePermissions().filter(rp => rp.roleId === role.id);
         const assignedKeys = rolePermissions.map(rp => rp.permissionKey);
 
-        if (assignedKeys.includes(permissionKey)) {
+        if (requiredKeys.some(k => assignedKeys.includes(k))) {
           return next();
         }
 
         // User direct permission overrides check
-        if (Array.isArray(currentUser.permissions) && currentUser.permissions.includes(permissionKey)) {
+        if (Array.isArray(currentUser.permissions) && requiredKeys.some(k => currentUser.permissions.includes(k))) {
           return next();
         }
 
         // Deny with 403 status code
-        return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: permissionKey });
+        return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: requiredKeys.join(', ') });
       } catch (err: any) {
-        return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: permissionKey });
+        return res.status(403).json({ error: 'ليس لديك صلاحية لتنفيذ هذا الإجراء', code: 'FORBIDDEN', requiredPermission: Array.isArray(permissionKey) ? permissionKey.join(', ') : permissionKey });
       }
     };
   };
@@ -4368,17 +4497,19 @@ async function startServer() {
           if (coupon.minOrderValue && subtotal < coupon.minOrderValue) isValid = false;
 
           if (isValid) {
+            const rawDiscountValue = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
             if (coupon.discountType === 'percentage') {
-              couponDiscountAmount = (subtotal * coupon.value) / 100;
+              couponDiscountAmount = (subtotal * rawDiscountValue) / 100;
               if (coupon.maxDiscountAmount && couponDiscountAmount > coupon.maxDiscountAmount) {
                 couponDiscountAmount = coupon.maxDiscountAmount;
               }
+              couponDiscountAmount = Math.min(couponDiscountAmount, subtotal);
             } else if (coupon.discountType === 'fixed') {
-              couponDiscountAmount = Math.min(coupon.value, subtotal);
+              couponDiscountAmount = Math.min(rawDiscountValue, subtotal);
             } else if (coupon.discountType === 'free_shipping') {
               couponDiscountAmount = shippingCost;
             }
-            couponDiscountAmount = Number(couponDiscountAmount.toFixed(2));
+            couponDiscountAmount = Math.max(0, Number(couponDiscountAmount.toFixed(2)));
             appliedCoupon = coupon;
           }
         }
@@ -4412,8 +4543,9 @@ async function startServer() {
         campaignDiscount: campaignDiscountAmount,
         appliedCoupon: finalAppliedCoupon ? {
           code: finalAppliedCoupon.code,
-          discountType: finalAppliedCoupon.discountType,
-          value: finalAppliedCoupon.value
+          discountType: finalAppliedCoupon.discountType || 'fixed',
+          value: finalAppliedCoupon.value ?? finalAppliedCoupon.discountValue ?? 0,
+          discountValue: finalAppliedCoupon.value ?? finalAppliedCoupon.discountValue ?? 0
         } : null,
         couponDiscount: couponDiscountAmount,
         finalDiscountAmount,
@@ -4839,16 +4971,20 @@ async function startServer() {
         movements = movements.filter(m => m.variantId === variantId);
       }
       if (type) {
-        movements = movements.filter(m => m.type === type);
+        movements = movements.filter(m => m.type === type || (m as any).movementType === type);
       }
       if (search) {
         const q = (search as string).toLowerCase().trim();
         movements = movements.filter(m =>
           (m.productTitle && m.productTitle.toLowerCase().includes(q)) ||
+          (m.productName && m.productName.toLowerCase().includes(q)) ||
           (m.variantInfo && m.variantInfo.toLowerCase().includes(q)) ||
+          (m.variantSku && m.variantSku.toLowerCase().includes(q)) ||
           (m.referenceId && m.referenceId.toLowerCase().includes(q)) ||
           (m.reason && m.reason.toLowerCase().includes(q)) ||
-          (m.createdBy && m.createdBy.toLowerCase().includes(q))
+          (m.createdBy && m.createdBy.toLowerCase().includes(q)) ||
+          (m.performedBy && m.performedBy.toLowerCase().includes(q)) ||
+          (m.performedByName && m.performedByName.toLowerCase().includes(q))
         );
       }
 
@@ -4860,8 +4996,16 @@ async function startServer() {
       const paginatedMovements = movements.slice(startIndex, startIndex + l);
 
       res.json({
+        success: true,
+        data: paginatedMovements,
         movements: paginatedMovements,
         pagination: {
+          total,
+          page: p,
+          limit: l,
+          totalPages
+        },
+        meta: {
           total,
           page: p,
           limit: l,
@@ -4955,13 +5099,13 @@ async function startServer() {
   // POST /api/admin/inventory/adjust
   app.post('/api/admin/inventory/adjust', requireAdmin, requirePermission('inventory.manage'), (req: any, res) => {
     try {
-      const { productId, variantId, type, quantity, referenceId, reason } = req.body;
+      const { productId, variantId, type, quantity, referenceId, referenceType, reason, note } = req.body;
 
       if (!productId) {
         return res.status(400).json({ error: 'معرف المنتج (productId) مطلوب' });
       }
 
-      const validTypes = ['in_purchase', 'in_adjustment', 'in_return', 'out_sale', 'out_damage', 'out_adjustment'];
+      const validTypes = ['in_purchase', 'in_adjustment', 'in_return', 'out_sale', 'out_damage', 'out_damaged', 'out_adjustment', 'manual_adjustment'];
       if (!type || !validTypes.includes(type)) {
         return res.status(400).json({ error: 'نوع تعديل المخزون غير صالح' });
       }
@@ -4976,7 +5120,9 @@ async function startServer() {
         return res.status(400).json({ error: 'سبب تعديل المخزون مطلوب' });
       }
 
-      const adminUser = req.admin?.email || 'مسؤول النظام';
+      const adminEmail = req.admin?.email || 'admin@store.com';
+      const adminName = req.admin?.name || req.admin?.email || 'مسؤول النظام';
+      const adminId = req.admin?.id || 'admin';
 
       const { product, movement } = db.adjustStock({
         productId,
@@ -4984,16 +5130,23 @@ async function startServer() {
         type,
         quantity: numQty,
         referenceId,
+        referenceType,
         reason: reason.trim(),
-        createdBy: adminUser
+        note: note ? String(note).trim() : reason.trim(),
+        createdBy: adminName,
+        adminId,
+        adminName
       });
 
       db.logAction('Admin', 'تعديل مخزون', `تم تعديل مخزون المنتج ${product.title} بمقدار ${numQty} (${type})`);
       logAudit(req, 'Inventory Adjustments', 'Product', productId, `تعديل مخزون المنتج ${product.title} بمقدار ${numQty} (${type}) - السبب: ${reason}`);
 
+      clearRouteCache('/api/products');
+      clearRouteCache('/api/admin/inventory');
+
       res.json({
         success: true,
-        message: 'تم تعديل المخزون بنجاح',
+        message: 'تم تعديل المخزون وتوثيق حركة الجرد بنجاح',
         product,
         movement
       });
@@ -5885,15 +6038,25 @@ async function startServer() {
   });
 
   // Admin Manage products: EDIT
-  app.put('/api/admin/products/:id', requireAdmin, requirePermission('products.edit'), (req, res) => {
+  app.put('/api/admin/products/:id', requireAdmin, requirePermission('products.edit'), (req: any, res) => {
     try {
-      const updated = db.updateProduct(req.params.id, req.body);
+      const adminEmail = req.admin?.email || 'admin@store.com';
+      const adminName = req.admin?.name || req.admin?.email || 'مسؤول النظام';
+      const adminId = req.admin?.id || 'admin';
+
+      const updated = db.updateProduct(
+        req.params.id,
+        req.body,
+        { adminId, adminName, adminEmail },
+        req.body.stockAdjustmentReason
+      );
       if (!updated) {
         return res.status(404).json({ error: 'Product not found' });
       }
       clearRouteCache('/api/products');
       clearRouteCache('/api/categories');
       clearRouteCache('/api/brands');
+      clearRouteCache('/api/admin/inventory');
       res.json(updated);
     } catch (err: any) {
       res.status(400).json({ error: err.message || 'Failed to update product' });
@@ -5933,14 +6096,30 @@ async function startServer() {
   // Admin Coupons: CREATE
   app.post('/api/admin/coupons', requireAdmin, requirePermission('campaigns.manage'), (req, res) => {
     try {
-      const { code, discountType, value, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, oneUsePerUser, isActive } = req.body;
+      const { code, discountType, value, discountValue, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, oneUsePerUser, isActive } = req.body;
       if (!code || !discountType) {
         return res.status(400).json({ error: 'كود الكوبون ونوع الخصم مطلوبان' });
       }
 
-      const vVal = validateBackendNumeric(value ?? 0, 'non_negative_decimal', { fieldNameArabic: 'قيمة الخصم' });
-      if (!vVal.isValid) {
-        return res.status(400).json({ error: vVal.error });
+      const rawVal = value !== undefined ? value : (discountValue !== undefined ? discountValue : 0);
+      let parsedValue = 0;
+
+      if (discountType === 'percentage') {
+        const vVal = validateBackendNumeric(rawVal, 'percentage', { min: 0.01, max: 100, fieldNameArabic: 'نسبة الخصم' });
+        if (!vVal.isValid) {
+          return res.status(400).json({ error: vVal.error });
+        }
+        parsedValue = vVal.value;
+      } else if (discountType === 'fixed') {
+        const vVal = validateBackendNumeric(rawVal, 'positive_decimal', { min: 0.01, fieldNameArabic: 'قيمة الخصم الثابت' });
+        if (!vVal.isValid) {
+          return res.status(400).json({ error: vVal.error });
+        }
+        parsedValue = vVal.value;
+      } else if (discountType === 'free_shipping') {
+        parsedValue = 0;
+      } else {
+        return res.status(400).json({ error: 'نوع الخصم غير صالح' });
       }
 
       let parsedMinOrder: number | undefined = undefined;
@@ -5973,7 +6152,8 @@ async function startServer() {
       const newCoupon: Coupon = {
         code: code.toUpperCase().trim(),
         discountType,
-        value: vVal.value,
+        value: parsedValue,
+        discountValue: parsedValue,
         minOrderValue: parsedMinOrder,
         maxDiscountAmount: parsedMaxDiscount,
         expiryDate: expiryDate || undefined,
@@ -5995,17 +6175,32 @@ async function startServer() {
   // Admin Coupons: UPDATE
   app.put('/api/admin/coupons/:code', requireAdmin, requirePermission('campaigns.manage'), (req, res) => {
     try {
-      const { discountType, value, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, oneUsePerUser, isActive } = req.body;
+      const { discountType, value, discountValue, minOrderValue, maxDiscountAmount, expiryDate, usageLimit, oneUsePerUser, isActive } = req.body;
       
       const updatedFields: Partial<Coupon> = {};
       if (discountType) updatedFields.discountType = discountType;
       
-      if (value !== undefined) {
-        const vVal = validateBackendNumeric(value, 'non_negative_decimal', { fieldNameArabic: 'قيمة الخصم' });
-        if (!vVal.isValid) {
-          return res.status(400).json({ error: vVal.error });
+      const rawVal = value !== undefined ? value : discountValue;
+      if (rawVal !== undefined) {
+        const effectiveType = discountType || 'fixed';
+        if (effectiveType === 'percentage') {
+          const vVal = validateBackendNumeric(rawVal, 'percentage', { min: 0.01, max: 100, fieldNameArabic: 'نسبة الخصم' });
+          if (!vVal.isValid) {
+            return res.status(400).json({ error: vVal.error });
+          }
+          updatedFields.value = vVal.value;
+          updatedFields.discountValue = vVal.value;
+        } else if (effectiveType === 'fixed') {
+          const vVal = validateBackendNumeric(rawVal, 'positive_decimal', { min: 0.01, fieldNameArabic: 'قيمة الخصم الثابت' });
+          if (!vVal.isValid) {
+            return res.status(400).json({ error: vVal.error });
+          }
+          updatedFields.value = vVal.value;
+          updatedFields.discountValue = vVal.value;
+        } else {
+          updatedFields.value = 0;
+          updatedFields.discountValue = 0;
         }
-        updatedFields.value = vVal.value;
       }
       
       if (minOrderValue !== undefined) {
@@ -6677,6 +6872,57 @@ async function startServer() {
     }
   });
 
+  // Admin Social Media Links Management (Dynamic Social Links System)
+  app.get('/api/admin/social-links', requireAdmin, (req, res) => {
+    try {
+      const links = db.getSocialLinks();
+      res.json(links);
+    } catch (err: any) {
+      res.status(500).json({ error: 'Failed to retrieve social links', message: err.message });
+    }
+  });
+
+  app.post('/api/admin/social-links', requireAdmin, requirePermission(['social.manage', 'settings.manage']), (req, res) => {
+    try {
+      const newLink = db.addSocialLink(req.body);
+      logAudit(req, 'Social Links', 'SocialLink', newLink.id, `إضافة منصة تواصل اجتماعي: ${newLink.name} (${newLink.url})`);
+      res.status(201).json(newLink);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل في إضافة منصة التواصل' });
+    }
+  });
+
+  app.put('/api/admin/social-links/reorder', requireAdmin, requirePermission(['social.manage', 'settings.manage']), (req, res) => {
+    try {
+      const items = req.body.items || req.body;
+      const updated = db.reorderSocialLinks(items);
+      logAudit(req, 'Social Links', 'SocialLink', 'reorder', 'إعادة ترتيب منصات التواصل الاجتماعي');
+      res.json(updated);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل في إعادة ترتيب منصات التواصل' });
+    }
+  });
+
+  app.put('/api/admin/social-links/:id', requireAdmin, requirePermission(['social.manage', 'settings.manage']), (req, res) => {
+    try {
+      const updated = db.updateSocialLink(req.params.id, req.body);
+      logAudit(req, 'Social Links', 'SocialLink', req.params.id, `تحديث منصة تواصل اجتماعي: ${updated.name}`);
+      res.json(updated);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل في تحديث منصة التواصل' });
+    }
+  });
+
+  app.delete('/api/admin/social-links/:id', requireAdmin, requirePermission(['social.manage', 'settings.manage']), (req, res) => {
+    try {
+      const result = db.deleteSocialLink(req.params.id);
+      logAudit(req, 'Delete', 'SocialLink', req.params.id, `حذف منصة تواصل اجتماعي ID: ${req.params.id}`);
+      res.json(result);
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل في حذف منصة التواصل' });
+    }
+  });
+
   // Mark all notifications as read
   app.post('/api/admin/notifications/read-all', requireAdmin, requirePermission('settings.manage'), (req, res) => {
     try {
@@ -7079,6 +7325,104 @@ async function startServer() {
       res.json({ success: true, message: `تم نقل ${movedCount} ملف بنجاح` });
     } catch (err: any) {
       res.status(500).json({ error: 'فشل نقل الملفات المحددة', message: err.message });
+    }
+  });
+
+  // 8. Media Folders - Get all folders with counts
+  app.get(['/api/admin/media/folders', '/api/media/folders'], requireAdmin, requirePermission('media.manage'), (req, res) => {
+    try {
+      const folders = db.getMediaFolders();
+      const media = db.getMedia();
+      const enrichedFolders = folders.map(f => ({
+        ...f,
+        count: media.filter(m => m.folderId === f.id || m.folder === f.name).length
+      }));
+      res.json({ success: true, folders: enrichedFolders });
+    } catch (err: any) {
+      res.status(500).json({ error: 'فشل جلب مجلدات الوسائط', message: err.message });
+    }
+  });
+
+  // 9. Media Folders - Create a new folder
+  app.post(['/api/admin/media/folders', '/api/media/folders'], requireAdmin, requirePermission('media.manage'), (req, res) => {
+    try {
+      const { name } = req.body;
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'اسم المجلد مطلوب' });
+      }
+
+      const trimmedName = name.trim();
+      const existing = db.getMediaFolders().find(f => f.name.toLowerCase() === trimmedName.toLowerCase());
+      if (existing) {
+        return res.status(400).json({ error: 'يوجد مجلد آخر بنفس هذا الاسم بالفعل' });
+      }
+
+      const newFolder = {
+        id: `folder_${Date.now()}`,
+        name: trimmedName,
+        count: 0,
+        isSystem: false,
+        createdAt: new Date().toISOString()
+      };
+
+      db.addMediaFolder(newFolder);
+      logAudit(req, 'Media Operations', 'MediaFolder', newFolder.id, `إنشاء مجلد وسائط جديد: ${newFolder.name}`);
+      res.status(201).json(newFolder);
+    } catch (err: any) {
+      res.status(500).json({ error: 'فشل إنشاء المجلد', message: err.message });
+    }
+  });
+
+  // 10. Media Folders - Rename custom folder
+  app.put(['/api/admin/media/folders/:id', '/api/media/folders/:id'], requireAdmin, requirePermission('media.manage'), (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name } = req.body;
+      if (!id) {
+        return res.status(400).json({ error: 'معرف المجلد مطلوب' });
+      }
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'اسم المجلد الجديد مطلوب' });
+      }
+
+      const result = db.renameMediaFolder(id, name.trim());
+      if (!result.success && result.message) {
+        return res.status(400).json({ error: result.message });
+      }
+
+      logAudit(req, 'Media Operations', 'MediaFolder', id, `إعادة تسمية مجلد الوسائط إلى: ${name.trim()}`);
+      res.json({ success: true, folder: result.folder });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل تعديل اسم المجلد' });
+    }
+  });
+
+  // 11. Media Folders - Delete custom folder (with safe check & moveToRoot)
+  app.delete(['/api/admin/media/folders/:id', '/api/media/folders/:id'], requireAdmin, requirePermission('media.manage'), (req, res) => {
+    try {
+      const { id } = req.params;
+      const moveToRoot = req.query.moveToRoot === 'true' || req.body?.moveToRoot === true;
+
+      if (!id) {
+        return res.status(400).json({ error: 'معرف المجلد مطلوب' });
+      }
+
+      const result = db.deleteMediaFolder(id, { moveToRoot });
+      if (!result.success) {
+        if ((result as any).blocked) {
+          return res.status(409).json({
+            error: result.message,
+            blocked: true,
+            itemCount: (result as any).itemCount
+          });
+        }
+        return res.status(400).json({ error: result.message || 'فشل حذف المجلد' });
+      }
+
+      logAudit(req, 'Media Operations', 'MediaFolder', id, `حذف مجلد وسائط: ${id}`);
+      res.json({ success: true, id, movedCount: (result as any).movedCount });
+    } catch (err: any) {
+      res.status(400).json({ error: err.message || 'فشل حذف المجلد' });
     }
   });
 

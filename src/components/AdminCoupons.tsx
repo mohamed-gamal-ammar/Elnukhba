@@ -92,8 +92,10 @@ export default function AdminCoupons({ onRefreshAll }: AdminCouponsProps) {
   const handleOpenEdit = (coupon: Coupon) => {
     setEditingCoupon(coupon);
     setCode(coupon.code);
-    setDiscountType(coupon.discountType);
-    setValue(coupon.value);
+    const type = coupon.discountType || 'fixed';
+    setDiscountType(type);
+    const rawVal = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
+    setValue(rawVal);
     setMinOrderValue(coupon.minOrderValue ? coupon.minOrderValue.toString() : '');
     setMaxDiscountAmount(coupon.maxDiscountAmount ? coupon.maxDiscountAmount.toString() : '');
     setExpiryDate(coupon.expiryDate || '');
@@ -171,8 +173,9 @@ export default function AdminCoupons({ onRefreshAll }: AdminCouponsProps) {
     const payload: Partial<Coupon> = {
       discountType,
       value: parsedValue,
+      discountValue: parsedValue,
       minOrderValue: parsedMinOrder,
-      maxDiscountAmount: parsedMaxDiscount,
+      maxDiscountAmount: discountType === 'percentage' ? parsedMaxDiscount : undefined,
       expiryDate: expiryDate || undefined,
       usageLimit: parsedUsageLimit,
       oneUsePerUser,
@@ -602,46 +605,76 @@ export default function AdminCoupons({ onRefreshAll }: AdminCouponsProps) {
 
             <form onSubmit={handleSave} className="space-y-4">
               
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">كود الكوبون (الرمز الرموز) <span className="text-red-500">*</span></label>
-                  <input
-                    type="text"
-                    required
-                    disabled={!!editingCoupon}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value)}
-                    placeholder="EGYPT2026"
-                    className="text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-white font-mono font-bold uppercase focus:outline-none focus:border-amber-500 disabled:opacity-50 text-center"
-                  />
-                  {!editingCoupon && <p className="text-[9px] text-slate-500 dark:text-slate-400">يفضل استعمال أحرف وأرقام إنجليزية كود ترويجي واضح</p>}
-                </div>
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">كود الكوبون الترويجي <span className="text-red-500">*</span></label>
+                <input
+                  type="text"
+                  required
+                  disabled={!!editingCoupon}
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="EGYPT2026"
+                  className="text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-white font-mono font-bold uppercase focus:outline-none focus:border-amber-500 disabled:opacity-50 text-center tracking-wider"
+                />
+                {!editingCoupon && <p className="text-[9px] text-slate-500 dark:text-slate-400">يفضل استعمال أحرف وأرقام إنجليزية لكود ترويجي واضح وسهل الحفظ</p>}
+              </div>
 
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">نوع الخصم <span className="text-red-500">*</span></label>
-                  <CustomSelect
-                    value={discountType}
-                    onChange={(val) => {
-                      const type = val as 'percentage' | 'fixed' | 'free_shipping';
-                      setDiscountType(type);
-                      if (type === 'free_shipping') setValue(0);
+              <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-700 dark:text-slate-300">نوع الخصم <span className="text-red-500">*</span></label>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setDiscountType('percentage')}
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      discountType === 'percentage'
+                        ? 'bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 ring-1 ring-amber-500/30'
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <Percent className="w-4 h-4 mb-1" />
+                    <span>نسبة مئوية (%)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setDiscountType('fixed')}
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      discountType === 'fixed'
+                        ? 'bg-amber-500/10 border-amber-500 text-amber-700 dark:text-amber-400 ring-1 ring-amber-500/30'
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <Coins className="w-4 h-4 mb-1" />
+                    <span>مبلغ ثابت (ج.م)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDiscountType('free_shipping');
+                      setValue(0);
                     }}
-                    size="sm"
-                    buttonClassName="text-xs bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-lg p-2.5 text-slate-900 dark:text-white focus:border-amber-500"
-                    menuClassName="bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
-                    options={[
-                      { value: 'percentage', label: 'نسبة مئوية (%)' },
-                      { value: 'fixed', label: 'مبلغ ثابت (ج.م)' },
-                      { value: 'free_shipping', label: 'شحن مجاني بالكامل 🚚' }
-                    ]}
-                  />
+                    className={`flex flex-col items-center justify-center p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                      discountType === 'free_shipping'
+                        ? 'bg-sky-500/10 border-sky-500 text-sky-700 dark:text-sky-400 ring-1 ring-sky-500/30'
+                        : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
+                    }`}
+                  >
+                    <Truck className="w-4 h-4 mb-1" />
+                    <span>شحن مجاني 🚚</span>
+                  </button>
                 </div>
               </div>
 
-              {discountType !== 'free_shipping' && (
+              {discountType !== 'free_shipping' ? (
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    {discountType === 'percentage' ? 'نسبة الخصم المئوية (%)' : 'مبلغ الخصم النقدي المباشر (ج.م)'} <span className="text-red-500">*</span>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
+                    <span>
+                      {discountType === 'percentage' ? 'نسبة الخصم المئوية (%)' : 'مبلغ الخصم النقدي المباشر (بالجنيه المصري)'} <span className="text-red-500">*</span>
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">
+                      {discountType === 'percentage' ? 'بين 0.01% و 100%' : 'قيمة نقدية تخصم بالجنيه'}
+                    </span>
                   </label>
                   <div className="relative">
                     <input
@@ -662,6 +695,11 @@ export default function AdminCoupons({ onRefreshAll }: AdminCouponsProps) {
                       {discountType === 'percentage' ? '%' : 'ج.م'}
                     </span>
                   </div>
+                </div>
+              ) : (
+                <div className="p-3 bg-sky-500/10 border border-sky-500/20 rounded-xl text-xs text-sky-700 dark:text-sky-400 font-medium flex items-center gap-2">
+                  <Truck className="w-4 h-4 shrink-0 text-sky-500" />
+                  <span>هذا الكوبون يعفي العميل من رسوم الشحن والتوصيل البري تلقائياً عند إتمام الطلب.</span>
                 </div>
               )}
 
