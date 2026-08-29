@@ -58,13 +58,9 @@ export default function SEOManager({ currentTab, selectedProduct, settings }: SE
             'addressCountry': 'EG'
           },
           'sameAs': (
-            Array.isArray(settings?.socialLinks) && settings.socialLinks.length > 0
+            Array.isArray(settings?.socialLinks)
               ? settings.socialLinks.filter(l => l.enabled !== false && l.url).map(l => l.url)
-              : [
-                  settings?.socialFacebook,
-                  settings?.socialInstagram,
-                  settings?.socialTwitter
-                ]
+              : []
           ).filter(Boolean),
           'priceRange': '$$$'
         });

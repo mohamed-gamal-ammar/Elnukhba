@@ -68,6 +68,22 @@ export function sanitizeText(text?: string): string {
     .trim();
 }
 
+export function cleanImageUrl(url?: string): string {
+  if (!url || typeof url !== 'string') return '';
+  let cleaned = url.trim();
+  if (/^(javascript|vbscript|data:(?!image\/))/i.test(cleaned)) {
+    return '';
+  }
+  // Decode legacy encoded characters and HTML entities
+  cleaned = cleaned
+    .replace(/&#x2F;/g, '/')
+    .replace(/&#47;/g, '/')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#x27;/g, "'");
+  return cleaned;
+}
+
 export function sanitizeSocialLink(input: any, isUpdate = false): Partial<SocialLink> {
   const result: Partial<SocialLink> = {};
 
@@ -98,7 +114,19 @@ export function sanitizeSocialLink(input: any, isUpdate = false): Partial<Social
       if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(formattedUrl)) {
         formattedUrl = `https://${formattedUrl}`;
       } else {
-        throw new Error('يرجى إدخال رابط صالح يبدأ بـ https:// أو http://');
+        throw new Error('يرجى إدخال رابط صالح يبدأ بـ https:// أو http:// أو mailto: أو tel:');
+      }
+    }
+    
+    // Strict structure validation using URL constructor for http/https URLs
+    if (/^https?:\/\//i.test(formattedUrl)) {
+      try {
+        const parsed = new URL(formattedUrl);
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          throw new Error('بروتوكول الرابط غير صالح');
+        }
+      } catch (e: any) {
+        throw new Error('الرابط المدخل غير صالح من الناحية التركيبية (Malformed URL)');
       }
     }
     result.url = formattedUrl;
@@ -130,6 +158,74 @@ export function sanitizeSocialLink(input: any, isUpdate = false): Partial<Social
   }
 
   return result;
+}
+
+/**
+ * Authoritative Coupon Discount Calculation Logic.
+ * 
+ * Rules:
+ * 1. Percentage:
+ *    discount = (subtotal * percentage) / 100
+ *    capped at maxDiscountAmount if specified.
+ *    bounded by: 0 <= discount <= subtotal.
+ * 
+ * 2. Fixed Amount:
+ *    discount = min(discountValue, subtotal)
+ *    ensures total product price never drops below 0.
+ * 
+ * 3. Free Shipping:
+ *    discount covers shipping cost (shippingCost), does NOT reduce product subtotal.
+ */
+export function calculateCouponDiscount(
+  coupon: Partial<Coupon>,
+  subtotal: number,
+  shippingCost: number = 0
+): { discountAmount: number; isApplicable: boolean; reason?: string } {
+  if (!coupon || !coupon.isActive) {
+    return { discountAmount: 0, isApplicable: false, reason: 'الكوبون غير نشط أو غير موجود' };
+  }
+
+  const cleanSubtotal = Math.max(0, Number(subtotal) || 0);
+  const cleanShipping = Math.max(0, Number(shippingCost) || 0);
+
+  // Check minimum order value against products subtotal
+  if (coupon.minOrderValue && coupon.minOrderValue > 0 && cleanSubtotal < coupon.minOrderValue) {
+    return {
+      discountAmount: 0,
+      isApplicable: false,
+      reason: `الحد الأدنى لتفعيل هذا الكوبون هو ${coupon.minOrderValue} ج.م`
+    };
+  }
+
+  const rawVal = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
+  const discountType = coupon.discountType || 'fixed';
+  let discountAmount = 0;
+
+  if (discountType === 'percentage') {
+    if (rawVal <= 0 || rawVal > 100) {
+      return { discountAmount: 0, isApplicable: false, reason: 'نسبة الخصم غير صالحة' };
+    }
+    discountAmount = (cleanSubtotal * rawVal) / 100;
+    if (coupon.maxDiscountAmount && coupon.maxDiscountAmount > 0 && discountAmount > coupon.maxDiscountAmount) {
+      discountAmount = coupon.maxDiscountAmount;
+    }
+    // Guarantee discount does not exceed product subtotal
+    discountAmount = Math.min(discountAmount, cleanSubtotal);
+  } else if (discountType === 'fixed') {
+    if (rawVal <= 0) {
+      return { discountAmount: 0, isApplicable: false, reason: 'قيمة الخصم الثابت غير صالحة' };
+    }
+    // Fixed discount: discount = min(discountValue, subtotal)
+    discountAmount = Math.min(rawVal, cleanSubtotal);
+  } else if (discountType === 'free_shipping') {
+    // Free shipping covers shipping cost, products subtotal remains untouched
+    discountAmount = cleanShipping;
+  } else {
+    return { discountAmount: 0, isApplicable: false, reason: 'نوع الخصم غير مدعوم' };
+  }
+
+  discountAmount = Math.max(0, Number(discountAmount.toFixed(2)));
+  return { discountAmount, isApplicable: true };
 }
 
 /**
@@ -719,9 +815,6 @@ const seedSettings: SystemSettings = {
   contactPhone: '19999',
   contactEmail: 'support@elite-appliances.com',
   contactAddress: 'شارع التسعين الشمالي، التجمع الخامس، القاهرة، مصر',
-  socialFacebook: 'https://facebook.com',
-  socialInstagram: 'https://instagram.com',
-  socialTwitter: 'https://twitter.com',
   bannerTitle: 'عروض الصيف الكبرى على الأجهزة المنزلية',
   bannerSubtitle: 'وفر حتى 5000 جنيه مصري مع شحن سريع وضمان معتمد يصل إلى 10 سنوات',
   bannerImage: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=1200',
@@ -1192,13 +1285,24 @@ export function initDb(): DatabaseSchema {
         phone: ''
       }
     };
-    fs.writeFileSync(DB_FILE, JSON.stringify(defaultDb, null, 2), 'utf-8');
+    saveDb(defaultDb);
     return defaultDb;
   }
 
   try {
     const content = fs.readFileSync(DB_FILE, 'utf-8');
-    const parsed = JSON.parse(content) as DatabaseSchema;
+    let parsed: DatabaseSchema;
+    try {
+      parsed = JSON.parse(content) as DatabaseSchema;
+    } catch (parseErr) {
+      // Attempt to sanitize unescaped control characters (except standard newlines and tabs)
+      try {
+        const cleaned = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+        parsed = JSON.parse(cleaned) as DatabaseSchema;
+      } catch {
+        throw parseErr;
+      }
+    }
     let modified = false;
     if (!parsed.admin) {
       parsed.admin = {
@@ -1426,26 +1530,30 @@ export function initDb(): DatabaseSchema {
     if (parsed.products) {
       parsed.products = parsed.products.map(p => {
         let pModified = false;
-        let mainImage = p.mainImage;
-        if (typeof mainImage === 'string' && mainImage.includes('&#x2F;')) {
-          mainImage = mainImage.replace(/&#x2F;/g, '/');
+        const mainImage = cleanImageUrl(p.mainImage);
+        if (mainImage !== p.mainImage) {
           pModified = true;
         }
         let images = p.images;
         if (Array.isArray(images)) {
-          const cleanedImages = images.map(img => typeof img === 'string' && img.includes('&#x2F;') ? img.replace(/&#x2F;/g, '/') : img);
+          const cleanedImages = images.map(cleanImageUrl).filter(Boolean);
           if (JSON.stringify(cleanedImages) !== JSON.stringify(images)) {
             images = cleanedImages;
             pModified = true;
           }
+        } else if (mainImage) {
+          images = [mainImage];
+          pModified = true;
         }
 
         const variants = (p.variants || []).map(v => {
           const vStock = typeof v.stock === 'number' ? v.stock : 0;
-          if (v.stock !== vStock) pModified = true;
+          const vImage = v.image ? cleanImageUrl(v.image) : undefined;
+          if (v.stock !== vStock || vImage !== v.image) pModified = true;
           return {
             ...v,
             stock: vStock,
+            image: vImage,
             lowStockThreshold: typeof v.lowStockThreshold === 'number' ? v.lowStockThreshold : 5
           };
         });
@@ -1474,14 +1582,9 @@ export function initDb(): DatabaseSchema {
     if (parsed.banners) {
       parsed.banners = parsed.banners.map(b => {
         let bMod = false;
-        let desktopImage = b.desktopImage;
-        let mobileImage = b.mobileImage;
-        if (typeof desktopImage === 'string' && desktopImage.includes('&#x2F;')) {
-          desktopImage = desktopImage.replace(/&#x2F;/g, '/');
-          bMod = true;
-        }
-        if (typeof mobileImage === 'string' && mobileImage.includes('&#x2F;')) {
-          mobileImage = mobileImage.replace(/&#x2F;/g, '/');
+        const desktopImage = cleanImageUrl(b.desktopImage);
+        const mobileImage = cleanImageUrl(b.mobileImage);
+        if (desktopImage !== b.desktopImage || mobileImage !== b.mobileImage) {
           bMod = true;
         }
         if (bMod) {
@@ -1493,27 +1596,64 @@ export function initDb(): DatabaseSchema {
     }
     if (parsed.media) {
       parsed.media = parsed.media.map(m => {
-        if (typeof m.url === 'string' && m.url.includes('&#x2F;')) {
+        const cleanedUrl = cleanImageUrl(m.url);
+        const cleanedThumb = m.thumbnailUrl ? cleanImageUrl(m.thumbnailUrl) : undefined;
+        if (cleanedUrl !== m.url || cleanedThumb !== m.thumbnailUrl) {
           modified = true;
-          return { ...m, url: m.url.replace(/&#x2F;/g, '/') };
+          return { ...m, url: cleanedUrl, thumbnailUrl: cleanedThumb };
         }
         return m;
       });
     }
     if (parsed.settings) {
-      if (typeof parsed.settings.bannerImage === 'string' && parsed.settings.bannerImage.includes('&#x2F;')) {
-        parsed.settings.bannerImage = parsed.settings.bannerImage.replace(/&#x2F;/g, '/');
-        modified = true;
+      if (parsed.settings.bannerImage) {
+        const cleaned = cleanImageUrl(parsed.settings.bannerImage);
+        if (cleaned !== parsed.settings.bannerImage) {
+          parsed.settings.bannerImage = cleaned;
+          modified = true;
+        }
       }
       const anySettings = parsed.settings as any;
-      if (typeof anySettings.logoUrl === 'string' && anySettings.logoUrl.includes('&#x2F;')) {
-        anySettings.logoUrl = anySettings.logoUrl.replace(/&#x2F;/g, '/');
-        modified = true;
+      if (anySettings.logoUrl) {
+        const cleaned = cleanImageUrl(anySettings.logoUrl);
+        if (cleaned !== anySettings.logoUrl) {
+          anySettings.logoUrl = cleaned;
+          modified = true;
+        }
       }
-      if (typeof anySettings.faviconUrl === 'string' && anySettings.faviconUrl.includes('&#x2F;')) {
-        anySettings.faviconUrl = anySettings.faviconUrl.replace(/&#x2F;/g, '/');
-        modified = true;
+      if (anySettings.faviconUrl) {
+        const cleaned = cleanImageUrl(anySettings.faviconUrl);
+        if (cleaned !== anySettings.faviconUrl) {
+          anySettings.faviconUrl = cleaned;
+          modified = true;
+        }
       }
+    }
+    const anyParsed = parsed as any;
+    if (anyParsed.categories && Array.isArray(anyParsed.categories)) {
+      anyParsed.categories = anyParsed.categories.map((c: any) => {
+        if (c.image) {
+          const cleaned = cleanImageUrl(c.image);
+          if (cleaned !== c.image) {
+            modified = true;
+            return { ...c, image: cleaned };
+          }
+        }
+        return c;
+      });
+    }
+    if (anyParsed.brands && Array.isArray(anyParsed.brands)) {
+      anyParsed.brands = anyParsed.brands.map((b: any) => {
+        let bMod = false;
+        const logo = b.logo ? cleanImageUrl(b.logo) : undefined;
+        const image = b.image ? cleanImageUrl(b.image) : undefined;
+        if (logo !== b.logo || image !== b.image) bMod = true;
+        if (bMod) {
+          modified = true;
+          return { ...b, logo, image };
+        }
+        return b;
+      });
     }
     if (parsed.coupons) {
       parsed.coupons = parsed.coupons.map((c: any) => {
@@ -1543,51 +1683,24 @@ export function initDb(): DatabaseSchema {
         return updated;
       });
     }
+    // Ensure legacy fixed social fields are permanently removed from settings object
+    if (parsed.settings) {
+      if ((parsed.settings as any).socialFacebook !== undefined) {
+        delete (parsed.settings as any).socialFacebook;
+        modified = true;
+      }
+      if ((parsed.settings as any).socialInstagram !== undefined) {
+        delete (parsed.settings as any).socialInstagram;
+        modified = true;
+      }
+      if ((parsed.settings as any).socialTwitter !== undefined) {
+        delete (parsed.settings as any).socialTwitter;
+        modified = true;
+      }
+    }
+
     if (!parsed.socialLinks || !Array.isArray(parsed.socialLinks) || parsed.socialLinks.length === 0) {
-      const migrated: SocialLink[] = [];
-      let orderIndex = 1;
-      const now = new Date().toISOString();
-
-      const fbUrl = parsed.settings?.socialFacebook || 'https://facebook.com';
-      migrated.push({
-        id: 'facebook',
-        name: 'Facebook',
-        url: fbUrl,
-        icon: 'facebook',
-        enabled: !!fbUrl,
-        order: orderIndex++,
-        openInNewTab: true,
-        createdAt: now,
-        updatedAt: now
-      });
-
-      const igUrl = parsed.settings?.socialInstagram || 'https://instagram.com';
-      migrated.push({
-        id: 'instagram',
-        name: 'Instagram',
-        url: igUrl,
-        icon: 'instagram',
-        enabled: !!igUrl,
-        order: orderIndex++,
-        openInNewTab: true,
-        createdAt: now,
-        updatedAt: now
-      });
-
-      const twUrl = parsed.settings?.socialTwitter || 'https://twitter.com';
-      migrated.push({
-        id: 'twitter',
-        name: 'Twitter',
-        url: twUrl,
-        icon: 'twitter',
-        enabled: !!twUrl,
-        order: orderIndex++,
-        openInNewTab: true,
-        createdAt: now,
-        updatedAt: now
-      });
-
-      parsed.socialLinks = migrated;
+      parsed.socialLinks = [...seedSocialLinks];
       modified = true;
     } else {
       parsed.socialLinks = parsed.socialLinks.map((s, idx) => ({
@@ -1603,7 +1716,7 @@ export function initDb(): DatabaseSchema {
       }));
     }
     if (modified) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(parsed, null, 2), 'utf-8');
+      saveDb(parsed);
     }
     return parsed;
   } catch (error) {
@@ -2466,7 +2579,10 @@ export const db = {
 
     return null;
   },
-  addProduct: (product: Product) => {
+  addProduct: (
+    product: Product,
+    adminInfo?: { adminId?: string; adminName?: string; adminEmail?: string } | string
+  ) => {
     // Strict Numeric Assertions
     product.price = assertNumeric(product.price, 'positive_decimal', { required: true, fieldNameArabic: 'سعر المنتج' })!;
     if (product.discountPrice !== undefined && product.discountPrice !== null) {
@@ -2498,6 +2614,12 @@ export const db = {
 
     if (product.variants && Array.isArray(product.variants)) {
       product.variants.forEach(v => {
+        if (!v.id) {
+          v.id = `var-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+        }
+        if (v.image) {
+          v.image = cleanImageUrl(v.image);
+        }
         v.price = assertNumeric(v.price, 'positive_decimal', { required: true, fieldNameArabic: 'سعر الموديل' })!;
         v.stock = assertNumeric(v.stock, 'non_negative_integer', { required: true, fieldNameArabic: 'مخزون الموديل' })!;
         if (v.originalPrice !== undefined && v.originalPrice !== null) {
@@ -2520,10 +2642,105 @@ export const db = {
           v.qrCode = db.generateUniqueQrCode(product.id, v.id);
         }
       });
+
+      // Recalculate parent stock if variants exist
+      if (product.variants.length > 0) {
+        product.stock = product.variants.reduce((sum, v) => sum + (typeof v.stock === 'number' ? v.stock : 0), 0);
+      }
+    }
+
+    if (product.mainImage) {
+      product.mainImage = cleanImageUrl(product.mainImage);
+    }
+    if (product.images && Array.isArray(product.images)) {
+      product.images = product.images.map(cleanImageUrl).filter(Boolean);
+      if (!product.mainImage && product.images.length > 0) {
+        product.mainImage = product.images[0];
+      }
+      if (product.mainImage && !product.images.includes(product.mainImage)) {
+        product.images.unshift(product.mainImage);
+      }
+    } else if (product.mainImage) {
+      product.images = [product.mainImage];
     }
 
     const data = initDb();
     data.products.push(product);
+
+    // Initial stock movement logging for complete audit trail
+    const adminEmail = typeof adminInfo === 'object' ? adminInfo?.adminEmail : (typeof adminInfo === 'string' ? adminInfo : undefined);
+    const adminName = typeof adminInfo === 'object' ? adminInfo?.adminName : (typeof adminInfo === 'string' ? adminInfo : undefined);
+    const adminId = typeof adminInfo === 'object' ? adminInfo?.adminId : undefined;
+    const actorName = adminName || adminEmail || 'مسؤول النظام';
+    const nowIso = new Date().toISOString();
+
+    const initialMovements: StockMovement[] = [];
+    if (product.variants && product.variants.length > 0) {
+      for (const v of product.variants) {
+        if (v.stock > 0) {
+          const parts = [v.size, v.color, v.capacity, v.sku ? `SKU: ${v.sku}` : ''].filter(Boolean);
+          const varInfo = parts.join(' / ') || `موديل #${v.id}`;
+          initialMovements.push({
+            id: 'sm_' + crypto.randomBytes(8).toString('hex'),
+            productId: product.id,
+            productTitle: product.title,
+            productName: product.title,
+            variantId: v.id,
+            variantInfo: varInfo,
+            variantSku: v.sku,
+            type: 'in_purchase',
+            movementType: 'initial_stock',
+            quantity: v.stock,
+            quantityDelta: v.stock,
+            previousStock: 0,
+            newStock: v.stock,
+            reason: 'رصيد مخزون افتتاحي عند إضافة الموديل بالمنتج',
+            note: 'رصيد مخزون افتتاحي',
+            performedBy: adminId || actorName,
+            performedByName: actorName,
+            adminName: actorName,
+            adminId: adminId,
+            reference: 'product_create_' + product.id,
+            referenceId: product.id,
+            referenceType: 'product_create',
+            createdBy: actorName,
+            createdAt: nowIso,
+            timestamp: nowIso
+          });
+        }
+      }
+    } else if (product.stock > 0) {
+      initialMovements.push({
+        id: 'sm_' + crypto.randomBytes(8).toString('hex'),
+        productId: product.id,
+        productTitle: product.title,
+        productName: product.title,
+        type: 'in_purchase',
+        movementType: 'initial_stock',
+        quantity: product.stock,
+        quantityDelta: product.stock,
+        previousStock: 0,
+        newStock: product.stock,
+        reason: 'رصيد مخزون افتتاحي عند إضافة المنتج',
+        note: 'رصيد مخزون افتتاحي',
+        performedBy: adminId || actorName,
+        performedByName: actorName,
+        adminName: actorName,
+        adminId: adminId,
+        reference: 'product_create_' + product.id,
+        referenceId: product.id,
+        referenceType: 'product_create',
+        createdBy: actorName,
+        createdAt: nowIso,
+        timestamp: nowIso
+      });
+    }
+
+    if (initialMovements.length > 0) {
+      data.stockMovements = data.stockMovements || [];
+      data.stockMovements.unshift(...initialMovements);
+    }
+
     saveDb(data);
     db.logAction('Admin', 'إضافة منتج جديد', `تمت إضافة المنتج ${product.title} بنجاح`);
     return product;
@@ -2613,9 +2830,20 @@ export const db = {
 
     if (updatedFields.variants && Array.isArray(updatedFields.variants)) {
       updatedFields.variants.forEach(v => {
+        if (v.image) v.image = cleanImageUrl(v.image);
         if (v.barcode) v.barcode = v.barcode.trim();
         if (v.qrCode) v.qrCode = v.qrCode.trim();
       });
+    }
+
+    if (updatedFields.mainImage !== undefined) {
+      updatedFields.mainImage = cleanImageUrl(updatedFields.mainImage);
+    }
+    if (updatedFields.images !== undefined && Array.isArray(updatedFields.images)) {
+      updatedFields.images = updatedFields.images.map(cleanImageUrl).filter(Boolean);
+      if (updatedFields.mainImage && !updatedFields.images.includes(updatedFields.mainImage)) {
+        updatedFields.images.unshift(updatedFields.mainImage);
+      }
     }
 
     // -------------------------------------------------------------
@@ -2672,7 +2900,49 @@ export const db = {
             note: noteText,
             performedBy: adminId || actorName,
             performedByName: actorName,
+            adminName: actorName,
             adminId: adminId,
+            reference: 'product_edit_' + existingProduct.id,
+            referenceId: existingProduct.id,
+            referenceType: 'product_edit',
+            createdBy: actorName,
+            createdAt: nowIso,
+            timestamp: nowIso
+          });
+        } else if (!matchedExisting && newVarStock > 0) {
+          // Brand new variant added during edit
+          const delta = newVarStock;
+          const parts = [
+            varItem.size,
+            varItem.color,
+            varItem.capacity,
+            varItem.sku ? `SKU: ${varItem.sku}` : ''
+          ].filter(Boolean);
+          const varInfo = parts.join(' / ') || `موديل #${varItem.id}`;
+
+          generatedMovements.push({
+            id: 'sm_' + crypto.randomBytes(8).toString('hex'),
+            productId: existingProduct.id,
+            productTitle: existingProduct.title,
+            productName: existingProduct.title,
+            variantId: varItem.id,
+            variantInfo: varInfo,
+            variantSku: varItem.sku,
+            type: 'in_adjustment',
+            movementType: 'manual_adjustment',
+            quantity: Math.abs(delta),
+            quantityDelta: delta,
+            previousStock: 0,
+            newStock: newVarStock,
+            reason: reasonText || 'إضافة موديل جديد بمخزون أولي',
+            note: noteText,
+            performedBy: adminId || actorName,
+            performedByName: actorName,
+            adminName: actorName,
+            adminId: adminId,
+            reference: 'product_edit_' + existingProduct.id,
+            referenceId: existingProduct.id,
+            referenceType: 'product_edit',
             createdBy: actorName,
             createdAt: nowIso,
             timestamp: nowIso
@@ -2703,7 +2973,11 @@ export const db = {
           note: noteText,
           performedBy: adminId || actorName,
           performedByName: actorName,
+          adminName: actorName,
           adminId: adminId,
+          reference: 'product_edit_' + existingProduct.id,
+          referenceId: existingProduct.id,
+          referenceType: 'product_edit',
           createdBy: actorName,
           createdAt: nowIso,
           timestamp: nowIso
@@ -2756,13 +3030,25 @@ export const db = {
       });
     }
 
-    // Filter out images that are still used by other products
+    // Filter out images that are still used by other products, media, or banners
     data.products.forEach(p => {
       if (p.mainImage) imagesToDelete.delete(p.mainImage);
       if (Array.isArray(p.images)) {
         p.images.forEach(img => imagesToDelete.delete(img));
       }
     });
+    if (Array.isArray(data.media)) {
+      data.media.forEach(m => {
+        if (m.url) imagesToDelete.delete(m.url);
+        if (m.thumbnailUrl) imagesToDelete.delete(m.thumbnailUrl);
+      });
+    }
+    if (Array.isArray(data.banners)) {
+      data.banners.forEach(b => {
+        if (b.desktopImage) imagesToDelete.delete(b.desktopImage);
+        if (b.mobileImage) imagesToDelete.delete(b.mobileImage);
+      });
+    }
 
     // Delete unused files
     imagesToDelete.forEach(imgUrl => {
@@ -3751,7 +4037,9 @@ export const db = {
   },
   getSettings: () => {
     const data = initDb();
-    const socialLinks = [...(data.socialLinks || [])].sort((a, b) => (a.order || 0) - (b.order || 0));
+    const socialLinks = [...(data.socialLinks || [])]
+      .filter(s => s.enabled !== false)
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
     return {
       ...data.settings,
       socialLinks
@@ -3975,9 +4263,10 @@ export const db = {
       throw new Error(`لا يمكن حذف هذه الصورة لأنها مستخدمة في: ${usages.map(u => u.name).join('، ')}`);
     }
 
-    const relativePath = item.url.replace(/^\//, '');
-    const fullPath = path.join(process.cwd(), 'public', relativePath);
-    if (fs.existsSync(fullPath)) {
+    const publicBase = path.resolve(process.cwd(), 'public');
+    const relativePath = path.normalize(item.url.replace(/^\//, '')).replace(/^(\.\.[\/\\])+/, '');
+    const fullPath = path.resolve(publicBase, relativePath);
+    if (fullPath.startsWith(publicBase) && fs.existsSync(fullPath)) {
       try {
         fs.unlinkSync(fullPath);
       } catch (err) {
@@ -3986,9 +4275,9 @@ export const db = {
     }
 
     if (item.thumbnailUrl) {
-      const thumbRelativePath = item.thumbnailUrl.replace(/^\//, '');
-      const thumbFullPath = path.join(process.cwd(), 'public', thumbRelativePath);
-      if (fs.existsSync(thumbFullPath)) {
+      const thumbRelativePath = path.normalize(item.thumbnailUrl.replace(/^\//, '')).replace(/^(\.\.[\/\\])+/, '');
+      const thumbFullPath = path.resolve(publicBase, thumbRelativePath);
+      if (thumbFullPath.startsWith(publicBase) && fs.existsSync(thumbFullPath)) {
         try {
           fs.unlinkSync(thumbFullPath);
         } catch (err) {
@@ -4018,10 +4307,26 @@ export const db = {
   addMediaFolder: (folder: MediaFolder) => {
     const data = initDb();
     data.folders = data.folders || [...seedFolders];
-    data.folders.push(folder);
+    const trimmed = (folder.name || '').trim();
+    if (!trimmed) {
+      throw new Error('اسم المجلد مطلوب');
+    }
+    const duplicate = data.folders.find(f => f.name.toLowerCase() === trimmed.toLowerCase());
+    if (duplicate) {
+      throw new Error('يوجد مجلد آخر بنفس هذا الاسم بالفعل');
+    }
+    const sanitizedFolder: MediaFolder = {
+      ...folder,
+      id: folder.id || `folder_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+      name: trimmed,
+      count: 0,
+      isSystem: Boolean(folder.isSystem),
+      createdAt: folder.createdAt || new Date().toISOString()
+    };
+    data.folders.push(sanitizedFolder);
     saveDb(data);
-    db.logAction('Admin', 'إنشاء مجلد وسائط', `تم إنشاء مجلد جديد باسم: ${folder.name}`);
-    return folder;
+    db.logAction('Admin', 'إنشاء مجلد وسائط', `تم إنشاء مجلد جديد باسم: ${sanitizedFolder.name}`);
+    return sanitizedFolder;
   },
 
   renameMediaFolder: (idOrName: string, newName: string) => {
@@ -4136,9 +4441,7 @@ export const db = {
   },
 
   adjustStock: (params: AdjustStockParams): { product: Product; movement: StockMovement } => {
-    const { productId, variantId, type, quantity: rawQuantity, referenceId, referenceType, reason, note, createdBy, adminId, adminName } = params;
-
-    const quantity = assertNumeric(rawQuantity, 'positive_integer', { required: true, min: 1, fieldNameArabic: 'كمية تعديل المخزون' })!;
+    const { productId, variantId, type, quantity: rawQuantity, targetStock, reference, referenceId, referenceType, reason, note, createdBy, adminId, adminName } = params;
 
     const isIncrement = ['in_purchase', 'in_adjustment', 'in_return'].includes(type);
     const isDecrement = ['out_sale', 'out_damage', 'out_damaged', 'out_adjustment'].includes(type);
@@ -4150,16 +4453,15 @@ export const db = {
     const data = initDb();
     const productIndex = data.products.findIndex(p => p.id === productId);
     if (productIndex === -1) {
-      throw new Error('المنتج غير موجود.');
+      throw new Error('المنتج غير موجود في قاعدة البيانات.');
     }
 
     const product = { ...data.products[productIndex] };
     let previousStock = 0;
     let newStock = 0;
+    let qtyChange = 0;
     let variantInfo = '';
     let variantSku = '';
-
-    const qtyChange = isIncrement ? Math.round(quantity) : -Math.round(quantity);
 
     if (variantId) {
       if (!product.variants || product.variants.length === 0) {
@@ -4173,10 +4475,19 @@ export const db = {
       const variantsCopy = [...product.variants];
       const variant = { ...variantsCopy[variantIndex] };
       previousStock = typeof variant.stock === 'number' ? variant.stock : 0;
-      newStock = previousStock + qtyChange;
+
+      if (targetStock !== undefined && targetStock !== null) {
+        const assertedTarget = assertNumeric(targetStock, 'non_negative_integer', { required: true, fieldNameArabic: 'المخزون المستهدف' })!;
+        newStock = assertedTarget;
+        qtyChange = newStock - previousStock;
+      } else {
+        const quantity = assertNumeric(rawQuantity, 'positive_integer', { required: true, min: 1, fieldNameArabic: 'كمية تعديل المخزون' })!;
+        qtyChange = isIncrement ? Math.round(quantity) : -Math.round(quantity);
+        newStock = previousStock + qtyChange;
+      }
 
       if (newStock < 0) {
-        throw new Error(`المخزون غير كافٍ للموديل. المخزون الحالي: ${previousStock}، المطلوب خصمه: ${quantity}`);
+        throw new Error(`المخزون غير كافٍ للموديل. المخزون الحالي: ${previousStock}، الناتج المتوقع: ${newStock}`);
       }
 
       variant.stock = newStock;
@@ -4200,19 +4511,29 @@ export const db = {
       }
 
       previousStock = typeof product.stock === 'number' ? product.stock : 0;
-      newStock = previousStock + qtyChange;
+
+      if (targetStock !== undefined && targetStock !== null) {
+        const assertedTarget = assertNumeric(targetStock, 'non_negative_integer', { required: true, fieldNameArabic: 'المخزون المستهدف' })!;
+        newStock = assertedTarget;
+        qtyChange = newStock - previousStock;
+      } else {
+        const quantity = assertNumeric(rawQuantity, 'positive_integer', { required: true, min: 1, fieldNameArabic: 'كمية تعديل المخزون' })!;
+        qtyChange = isIncrement ? Math.round(quantity) : -Math.round(quantity);
+        newStock = previousStock + qtyChange;
+      }
 
       if (newStock < 0) {
-        throw new Error(`المخزون غير كافٍ للمنتج. المخزون الحالي: ${previousStock}، المطلوب خصمه: ${quantity}`);
+        throw new Error(`المخزون غير كافٍ للمنتج. المخزون الحالي: ${previousStock}، الناتج المتوقع: ${newStock}`);
       }
 
       product.stock = newStock;
     }
 
     const actor = adminName || createdBy || 'مسؤول النظام';
-    const reasonText = reason || 'تعديل يدوي للمخزون';
+    const reasonText = reason || (type === 'manual_adjustment' ? 'تعديل يدوي للمخزون' : isIncrement ? 'إضافة مخزون' : 'خصم مخزون');
     const noteText = note || reasonText;
     const nowIso = new Date().toISOString();
+    const effectiveRef = reference || referenceId || (variantId ? `manual_var_${variantId}` : `manual_prod_${product.id}`);
 
     const movement: StockMovement = {
       id: 'sm_' + crypto.randomBytes(8).toString('hex'),
@@ -4224,16 +4545,18 @@ export const db = {
       variantSku: variantSku || undefined,
       type,
       movementType: type,
-      quantity: Math.round(quantity),
+      quantity: Math.abs(qtyChange),
       quantityDelta: qtyChange,
       previousStock,
       newStock,
-      referenceId: referenceId || undefined,
-      referenceType: referenceType || (referenceId ? 'ref' : undefined),
+      reference: effectiveRef,
+      referenceId: referenceId || effectiveRef,
+      referenceType: referenceType || (referenceId ? 'ref' : 'manual'),
       reason: reasonText,
       note: noteText,
       performedBy: adminId || actor,
       performedByName: actor,
+      adminName: actor,
       adminId: adminId || undefined,
       createdBy: actor,
       createdAt: nowIso,
@@ -4243,6 +4566,8 @@ export const db = {
     data.products[productIndex] = product;
     data.stockMovements = data.stockMovements || [];
     data.stockMovements.unshift(movement);
+
+    saveDb(data);
 
     saveDb(data);
 
@@ -6217,6 +6542,10 @@ export const db = {
     saveDb(data);
     db.logAction('Admin', 'إعادة ترتيب روابط التواصل', 'تم تحديث ترتيب منصات التواصل الاجتماعي');
     return data.socialLinks;
+  },
+
+  calculateCouponDiscount: (coupon: Partial<Coupon>, subtotal: number, shippingCost: number = 0) => {
+    return calculateCouponDiscount(coupon, subtotal, shippingCost);
   }
 
 };

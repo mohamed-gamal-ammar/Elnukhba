@@ -768,7 +768,7 @@ export const api = {
     const qStr = query.toString();
     return fetchApi<any[]>(`/api/admin/inventory/low-stock${qStr ? `?${qStr}` : ''}`);
   },
-  adjustInventoryStock: (data: { productId: string; variantId?: string; type: string; quantity: number; referenceId?: string; reason: string }) =>
+  adjustInventoryStock: (data: { productId: string; variantId?: string; type: string; quantity: number; targetStock?: number; referenceId?: string; reason: string }) =>
     fetchApi<any>('/api/admin/inventory/adjust', {
       method: 'POST',
       body: JSON.stringify(data)

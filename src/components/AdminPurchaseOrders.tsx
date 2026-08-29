@@ -819,15 +819,18 @@ export default function AdminPurchaseOrders({ onRefreshAll }: AdminPurchaseOrder
                       <tr key={po.id} className="hover:bg-slate-50 dark:hover:bg-slate-950/20 transition-colors">
                         {/* PO Number */}
                         <td className="py-3 px-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-slate-950 px-2 py-1 rounded text-xs border border-amber-200 dark:border-slate-800">
+                          <div className="group inline-flex items-center gap-1.5">
+                            <span className="whitespace-nowrap font-mono font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg text-xs tracking-wide inline-flex items-center">
                               #{po.poNumber}
                             </span>
                             <button
                               type="button"
                               onClick={() => handleCopyPoNumber(po.poNumber, po.id)}
-                              className="text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition-colors cursor-pointer"
+                              className={`transition-opacity p-1 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-amber-600 dark:text-slate-500 dark:hover:text-amber-400 rounded-md cursor-pointer ${
+                                copiedId === po.id ? 'opacity-100 text-emerald-500 dark:text-emerald-400' : 'opacity-0 group-hover:opacity-100'
+                              }`}
                               title="نسخ رقم أمر الشراء"
+                              aria-label="نسخ رقم أمر الشراء"
                             >
                               {copiedId === po.id ? (
                                 <Check className="w-3.5 h-3.5 text-emerald-500 dark:text-emerald-400" />
@@ -836,8 +839,13 @@ export default function AdminPurchaseOrders({ onRefreshAll }: AdminPurchaseOrder
                               )}
                             </button>
                           </div>
-                          <div className="text-[10px] text-slate-500 mt-1">
-                            {new Date(po.createdAt).toLocaleDateString('ar-EG')}
+                          <div className="text-[11px] text-slate-400 dark:text-slate-400 mt-1 whitespace-nowrap flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-slate-400/80 shrink-0" />
+                            <span>
+                              {new Date(po.createdAt).toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' })}
+                              {' • '}
+                              {new Date(po.createdAt).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                           </div>
                         </td>
 

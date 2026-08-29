@@ -149,29 +149,59 @@ async function startServer() {
   const sanitizeValue = (val: any): any => {
     if (typeof val === 'string') {
       const trimmed = val.trim();
-      // Safe URL / Path handling: preserve & and / in valid URLs and paths while blocking XSS/javascript: protocols
-      if (
-        (trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('/uploads/') || trimmed.startsWith('data:image/')) &&
-        !trimmed.toLowerCase().includes('javascript:') &&
-        !trimmed.includes('<') &&
-        !trimmed.includes('>') &&
-        !trimmed.includes('"') &&
-        !trimmed.includes("'")
-      ) {
-        return trimmed;
+      
+      // Check for URL, relative/absolute image paths, or data URIs
+      const isUrlOrPath = 
+        trimmed.startsWith('http://') || 
+        trimmed.startsWith('https://') || 
+        trimmed.startsWith('/uploads/') || 
+        trimmed.startsWith('uploads/') || 
+        trimmed.startsWith('/images/') || 
+        trimmed.startsWith('images/') || 
+        trimmed.startsWith('/') || 
+        trimmed.startsWith('data:image/');
+
+      const hasDangerousPattern = 
+        /javascript\s*:/i.test(trimmed) ||
+        /vbscript\s*:/i.test(trimmed) ||
+        /data\s*:\s*text\/html/i.test(trimmed) ||
+        /<script\b/i.test(trimmed) ||
+        /<\s*\/?\s*[a-z][\s\S]*>/i.test(trimmed) ||
+        /on\w+\s*=/i.test(trimmed);
+
+      // Preserve clean URLs and image paths completely intact (restoring any legacy corrupted entities)
+      if (isUrlOrPath && !hasDangerousPattern && !trimmed.includes('<') && !trimmed.includes('>')) {
+        return trimmed
+          .replace(/&#x2F;/g, '/')
+          .replace(/&#47;/g, '/')
+          .replace(/&amp;/g, '&')
+          .replace(/&quot;/g, '"')
+          .replace(/&#x27;/g, "'");
       }
+
+      // If dangerous patterns are found, sanitize them aggressively
+      if (hasDangerousPattern) {
+        return trimmed
+          .replace(/javascript\s*:/gi, '')
+          .replace(/vbscript\s*:/gi, '')
+          .replace(/data\s*:\s*text\/html/gi, '')
+          .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+          .replace(/<[^>]*>/g, '')
+          .replace(/on\w+\s*=/gi, '');
+      }
+
+      // Standard text sanitization: escape only HTML angle brackets to prevent DOM injection
+      // Keeps forward slashes '/', query ampersands '&', quotes, and arabic text intact
       return val
-        .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#x27;');
+        .replace(/&#x2F;/g, '/');
     } else if (Array.isArray(val)) {
       return val.map(sanitizeValue);
     } else if (val !== null && typeof val === 'object') {
       const cleanedObj: any = {};
       for (const [key, value] of Object.entries(val)) {
-        if (key === '__proto__' || key === 'constructor') continue;
+        if (key === '__proto__' || key === 'constructor' || key === 'prototype') continue;
         cleanedObj[key] = sanitizeValue(value);
       }
       return cleanedObj;
@@ -589,22 +619,36 @@ async function startServer() {
         }
       }
 
+      const normalizePhone = (p: any): string => {
+        if (!p || typeof p !== 'string') return '';
+        return p.replace(/\D/g, '').replace(/^(20|0020)/, '0');
+      };
+
       const resolvedEmail = (sessionCustomer?.email || (email as string) || '').toLowerCase().trim();
-      const resolvedPhone = (sessionCustomer?.phone || (phone as string) || '').trim();
+      const rawPhone = (sessionCustomer?.phone || (phone as string) || '').trim();
+      const normPhone = normalizePhone(rawPhone);
       const resolvedCustomerId = (sessionCustomerId || (customerId as string) || sessionCustomer?.id || '').trim();
 
       const customerIdentifiers = [
         resolvedCustomerId,
         resolvedEmail,
-        resolvedPhone
+        rawPhone,
+        normPhone
       ].filter(Boolean);
 
       // Check Single-Use Per Customer Rule (once per user)
       if (coupon.oneUsePerUser) {
         // 1. Check coupon's recorded usedByUsers list
-        const inUsedByUsers = customerIdentifiers.length > 0 && customerIdentifiers.some(id => 
-          (coupon.usedByUsers || []).some(u => u && u.toLowerCase().trim() === id.toLowerCase())
-        );
+        const inUsedByUsers = customerIdentifiers.length > 0 && customerIdentifiers.some(id => {
+          const lowerId = id.toLowerCase().trim();
+          const normId = normalizePhone(lowerId);
+          return (coupon.usedByUsers || []).some(u => {
+            if (!u) return false;
+            const lowerU = u.toLowerCase().trim();
+            const normU = normalizePhone(lowerU);
+            return lowerU === lowerId || (normId && normU && normId === normU);
+          });
+        });
 
         // 2. Cross-check against completed past orders in database for airtight security
         const existingOrders = db.getOrders();
@@ -612,13 +656,24 @@ async function startServer() {
           if (!order.couponCode || order.couponCode.toUpperCase() !== cleanCode) return false;
           if (order.status === 'Cancelled') return false; // Cancelled orders do not block reuse
           const orderCust: any = order.customer || {};
+          const pastRawPhone = (orderCust?.phone || '').trim();
+          const pastNormPhone = normalizePhone(pastRawPhone);
           const pastOrderIdentifiers = [
             order.customerId,
             order.userId,
             (orderCust?.email || '').toLowerCase().trim(),
-            (orderCust?.phone || '').trim()
+            pastRawPhone,
+            pastNormPhone
           ].filter(Boolean);
-          return customerIdentifiers.some(id => pastOrderIdentifiers.some(pId => pId.toLowerCase() === id.toLowerCase()));
+          return customerIdentifiers.some(id => {
+            const lowerId = id.toLowerCase().trim();
+            const normId = normalizePhone(lowerId);
+            return pastOrderIdentifiers.some(pId => {
+              const lowerP = pId.toLowerCase().trim();
+              const normP = normalizePhone(lowerP);
+              return lowerP === lowerId || (normId && normP && normId === normP);
+            });
+          });
         });
 
         if (inUsedByUsers || inPastOrders) {
@@ -655,30 +710,29 @@ async function startServer() {
       }
 
       // Calculate discount amount for preview (DO NOT consume or increment usage count here)
-      let discountAmount = 0;
-      const rawVal = coupon.value ?? coupon.discountValue ?? 0;
-      if (coupon.discountType === 'percentage') {
-        discountAmount = (totalAmount * rawVal) / 100;
-        if (coupon.maxDiscountAmount && discountAmount > coupon.maxDiscountAmount) {
-          discountAmount = coupon.maxDiscountAmount;
+      let shippingCost = 0;
+      const settings = db.getSettings();
+      shippingCost = settings.shippingFlatRate || 0;
+      if (governorate) {
+        const provinces = db.getShippingProvinces();
+        const selectedProvince = provinces.find(p => p.name === (governorate as string));
+        if (selectedProvince && selectedProvince.isActive) {
+          shippingCost = selectedProvince.price;
         }
-        discountAmount = Math.min(discountAmount, totalAmount);
-      } else if (coupon.discountType === 'fixed') {
-        discountAmount = Math.min(rawVal, totalAmount);
-      } else if (coupon.discountType === 'free_shipping') {
-        const settings = db.getSettings();
-        let shippingCost = settings.shippingFlatRate;
-        if (governorate) {
-          const provinces = db.getShippingProvinces();
-          const selectedProvince = provinces.find(p => p.name === (governorate as string));
-          if (selectedProvince && selectedProvince.isActive) {
-            shippingCost = selectedProvince.price;
-          }
-        }
-        discountAmount = shippingCost;
       }
 
-      discountAmount = Math.max(0, Number(discountAmount.toFixed(2)));
+      const discountResult = db.calculateCouponDiscount(coupon, totalAmount, shippingCost);
+      if (!discountResult.isApplicable) {
+        return res.status(400).json({
+          valid: false,
+          errorCode: 'COUPON_NOT_APPLICABLE',
+          error: discountResult.reason || 'الكوبون غير قابل للتطبيق على هذه السلة',
+          message: discountResult.reason || 'الكوبون غير قابل للتطبيق على هذه السلة'
+        });
+      }
+
+      const discountAmount = discountResult.discountAmount;
+      const rawVal = coupon.value ?? coupon.discountValue ?? 0;
 
       res.json({
         valid: true,
@@ -893,31 +947,56 @@ async function startServer() {
 
           // Verify One Use Per User
           if (coupon.oneUsePerUser) {
+            const normalizePhone = (p: any): string => {
+              if (!p || typeof p !== 'string') return '';
+              return p.replace(/\D/g, '').replace(/^(20|0020)/, '0');
+            };
+
+            const orderRawPhone = (customer.phone || orderCustomerObj?.phone || '').trim();
+            const orderNormPhone = normalizePhone(orderRawPhone);
             const orderCustomerIdentifiers = [
               orderUserId,
               orderCustomerObj?.id,
-              orderCustomerObj?.email,
-              orderCustomerObj?.phone,
-              (customer.email || '').toLowerCase().trim(),
-              (customer.phone || '').trim()
+              orderCustomerObj?.email ? orderCustomerObj.email.toLowerCase().trim() : '',
+              orderRawPhone,
+              orderNormPhone,
+              customer.email ? customer.email.toLowerCase().trim() : ''
             ].filter(Boolean) as string[];
 
-            const inUsedByUsers = orderCustomerIdentifiers.some(id => 
-              (coupon.usedByUsers || []).some(u => u && u.toLowerCase().trim() === id.toLowerCase().trim())
-            );
+            const inUsedByUsers = orderCustomerIdentifiers.some(id => {
+              const lowerId = id.toLowerCase().trim();
+              const normId = normalizePhone(lowerId);
+              return (coupon.usedByUsers || []).some(u => {
+                if (!u) return false;
+                const lowerU = u.toLowerCase().trim();
+                const normU = normalizePhone(lowerU);
+                return lowerU === lowerId || (normId && normU && normId === normU);
+              });
+            });
 
             const existingOrders = db.getOrders();
             const inPastOrders = existingOrders.some(pastOrder => {
               if (!pastOrder.couponCode || pastOrder.couponCode.toUpperCase() !== cleanCouponCode) return false;
               if (pastOrder.status === 'Cancelled') return false; // Cancelled orders do not block reuse
               const pastCust: any = pastOrder.customer || {};
+              const pastRawPhone = (pastCust?.phone || '').trim();
+              const pastNormPhone = normalizePhone(pastRawPhone);
               const pastOrderIdentifiers = [
                 pastOrder.customerId,
                 pastOrder.userId,
                 (pastCust?.email || '').toLowerCase().trim(),
-                (pastCust?.phone || '').trim()
+                pastRawPhone,
+                pastNormPhone
               ].filter(Boolean) as string[];
-              return orderCustomerIdentifiers.some(id => pastOrderIdentifiers.some(pId => pId.toLowerCase() === id.toLowerCase().trim()));
+              return orderCustomerIdentifiers.some(id => {
+                const lowerId = id.toLowerCase().trim();
+                const normId = normalizePhone(lowerId);
+                return pastOrderIdentifiers.some(pId => {
+                  const lowerP = pId.toLowerCase().trim();
+                  const normP = normalizePhone(lowerP);
+                  return lowerP === lowerId || (normId && normP && normId === normP);
+                });
+              });
             });
 
             if (inUsedByUsers || inPastOrders) {
@@ -931,20 +1010,11 @@ async function startServer() {
           }
 
           if (isValid) {
-            const rawDiscountValue = coupon.value !== undefined ? coupon.value : (coupon.discountValue !== undefined ? coupon.discountValue : 0);
-            if (coupon.discountType === 'percentage') {
-              couponDiscountAmount = (subtotal * rawDiscountValue) / 100;
-              if (coupon.maxDiscountAmount && couponDiscountAmount > coupon.maxDiscountAmount) {
-                couponDiscountAmount = coupon.maxDiscountAmount;
-              }
-              couponDiscountAmount = Math.min(couponDiscountAmount, subtotal);
-            } else if (coupon.discountType === 'fixed') {
-              couponDiscountAmount = Math.min(rawDiscountValue, subtotal);
-            } else if (coupon.discountType === 'free_shipping') {
-              couponDiscountAmount = shippingCost;
+            const discountCalc = db.calculateCouponDiscount(coupon, subtotal, shippingCost);
+            if (discountCalc.isApplicable && discountCalc.discountAmount > 0) {
+              couponDiscountAmount = discountCalc.discountAmount;
+              appliedCoupon = coupon;
             }
-            couponDiscountAmount = Math.max(0, Number(couponDiscountAmount.toFixed(2)));
-            appliedCoupon = coupon;
           }
         }
       }
@@ -1008,18 +1078,27 @@ async function startServer() {
       }
 
       if (finalAppliedCoupon && appliedCoupon) {
+        const normalizePhone = (p: any): string => {
+          if (!p || typeof p !== 'string') return '';
+          return p.replace(/\D/g, '').replace(/^(20|0020)/, '0');
+        };
+
+        const recRawPhone = (customer.phone || orderCustomerObj?.phone || '').trim();
+        const recNormPhone = normalizePhone(recRawPhone);
         const userIdentifiers = [
           orderUserId,
-          orderCustomerObj?.email,
-          orderCustomerObj?.phone,
-          (customer.email || '').toLowerCase().trim(),
-          (customer.phone || '').trim()
+          orderCustomerObj?.id,
+          orderCustomerObj?.email ? orderCustomerObj.email.toLowerCase().trim() : '',
+          recRawPhone,
+          recNormPhone,
+          customer.email ? customer.email.toLowerCase().trim() : ''
         ].filter(Boolean) as string[];
 
         const updatedUsers = [...(appliedCoupon.usedByUsers || [])];
         userIdentifiers.forEach(id => {
-          if (!updatedUsers.some(u => u && u.toLowerCase().trim() === id.toLowerCase().trim())) {
-            updatedUsers.push(id);
+          const lowerId = id.toLowerCase().trim();
+          if (!updatedUsers.some(u => u && u.toLowerCase().trim() === lowerId)) {
+            updatedUsers.push(lowerId);
           }
         });
 
@@ -5129,6 +5208,8 @@ async function startServer() {
         variantId,
         type,
         quantity: numQty,
+        targetStock: req.body.targetStock,
+        reference: req.body.reference || referenceId,
         referenceId,
         referenceType,
         reason: reason.trim(),
@@ -5143,6 +5224,8 @@ async function startServer() {
 
       clearRouteCache('/api/products');
       clearRouteCache('/api/admin/inventory');
+      clearRouteCache('/api/admin/inventory/movements');
+      clearRouteCache('/api/admin/inventory/low-stock');
 
       res.json({
         success: true,
@@ -5967,7 +6050,7 @@ async function startServer() {
   });
 
   // Admin Manage products: ADD
-  app.post('/api/admin/products', requireAdmin, requirePermission('products.create'), (req, res) => {
+  app.post('/api/admin/products', requireAdmin, requirePermission('products.create'), (req: any, res) => {
     try {
       const prodData = req.body;
       if (!prodData.title || prodData.price === undefined || prodData.price === null || !prodData.sku) {
@@ -6027,10 +6110,17 @@ async function startServer() {
         flashSaleEnds: prodData.flashSaleEnds || ''
       };
 
-      const added = db.addProduct(newProd);
+      const adminEmail = req.admin?.email || 'admin@store.com';
+      const adminName = req.admin?.name || req.admin?.email || 'مسؤول النظام';
+      const adminId = req.admin?.id || 'admin';
+
+      const added = db.addProduct(newProd, { adminId, adminName, adminEmail });
       clearRouteCache('/api/products');
       clearRouteCache('/api/categories');
       clearRouteCache('/api/brands');
+      clearRouteCache('/api/admin/inventory');
+      clearRouteCache('/api/admin/inventory/movements');
+      clearRouteCache('/api/admin/inventory/low-stock');
       res.status(201).json(added);
     } catch (err: any) {
       res.status(400).json({ error: err.message || 'Failed to add product' });
@@ -6057,6 +6147,8 @@ async function startServer() {
       clearRouteCache('/api/categories');
       clearRouteCache('/api/brands');
       clearRouteCache('/api/admin/inventory');
+      clearRouteCache('/api/admin/inventory/movements');
+      clearRouteCache('/api/admin/inventory/low-stock');
       res.json(updated);
     } catch (err: any) {
       res.status(400).json({ error: err.message || 'Failed to update product' });
@@ -6873,7 +6965,7 @@ async function startServer() {
   });
 
   // Admin Social Media Links Management (Dynamic Social Links System)
-  app.get('/api/admin/social-links', requireAdmin, (req, res) => {
+  app.get('/api/admin/social-links', requireAdmin, requirePermission(['social.manage', 'settings.manage']), (req, res) => {
     try {
       const links = db.getSocialLinks();
       res.json(links);
@@ -7313,15 +7405,23 @@ async function startServer() {
         return res.status(400).json({ error: 'يرجى تحديد الملفات المراد نقلها' });
       }
 
+      const folderObj = folder && folder !== '__root__' ? db.getMediaFolderById(folder) : null;
+      const targetFolderName = folderObj ? folderObj.name : (folder && folder !== '__root__' ? folder : '');
+      const targetFolderId = folderObj ? folderObj.id : (folder && folder !== '__root__' ? folder : null);
+
       let movedCount = 0;
       for (const id of ids) {
         const item = db.getMediaById(id);
         if (item) {
-          db.updateMediaFields(id, { folder: folder || '' });
+          db.updateMediaFields(id, { 
+            folder: targetFolderName,
+            folderId: targetFolderId
+          });
           movedCount++;
         }
       }
 
+      logAudit(req, 'Media Operations', 'Media', ids.join(','), `نقل ${movedCount} ملف وسائط إلى المجلد: ${targetFolderName || 'الرئيسي (Root)'}`);
       res.json({ success: true, message: `تم نقل ${movedCount} ملف بنجاح` });
     } catch (err: any) {
       res.status(500).json({ error: 'فشل نقل الملفات المحددة', message: err.message });
@@ -7547,8 +7647,13 @@ async function startServer() {
         return res.status(400).json({ error: 'مسار غير صالح لحذف الصورة' });
       }
 
-      const relativePath = url.replace(/^\//, '');
-      const fullPath = path.join(process.cwd(), 'public', relativePath);
+      const uploadBase = path.resolve(UPLOAD_DIR);
+      const cleanFilename = path.normalize(url.replace(/^\/uploads\//, '')).replace(/^(\.\.[\/\\])+/, '');
+      const fullPath = path.resolve(uploadBase, cleanFilename);
+
+      if (!fullPath.startsWith(uploadBase) || !fs.existsSync(fullPath)) {
+        return res.status(400).json({ error: 'مسار غير صالح أو ملف غير موجود' });
+      }
 
       // Verify if the image is used by any product or setting before deleting
       const products = db.getProducts();

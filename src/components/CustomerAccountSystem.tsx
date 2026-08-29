@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  User, MapPin, Heart, ShoppingBag, Bell, Shield, Lock, Trash2, Edit2,
+  User, MapPin, Heart, ShoppingBag, Package, Bell, Shield, ShieldCheck, Lock, Trash2, Edit2,
   Plus, CheckCircle, AlertTriangle, Key, Loader2, X, ExternalLink,
   Calendar, RefreshCw, Send, Mail, Check, Phone, ChevronRight, Eye, EyeOff,
   Truck, CreditCard, Tag, Star, MessageSquare, RotateCcw, ArrowLeftRight,
@@ -1212,66 +1212,114 @@ export default function CustomerAccountSystem({
         
         {/* RIGHT DRAWER / SIDE NAVIGATION BAR */}
         <div className="lg:col-span-1 space-y-4">
-          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-amber-500/20 p-4 flex flex-col gap-1.5 transition-colors duration-200">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 flex flex-col gap-1 transition-colors duration-200">
             <button
               onClick={() => { setActiveTab('profile'); clearError(); }}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'profile' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'profile'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
-              <User className="w-5 h-5" />
-              الملف الشخصي والبيانات
+              <User className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+              <span>الملف الشخصي والبيانات</span>
             </button>
 
             <button
               onClick={() => { setActiveTab('addresses'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'addresses' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'addresses'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <MapPin className="w-5 h-5" />
-                دفتر العناوين المحفوظة
+                <MapPin className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>دفتر العناوين المحفوظة</span>
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{addresses.length}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'addresses'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {addresses.length}
+              </span>
             </button>
 
             <button
               onClick={() => { setActiveTab('wishlist'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'wishlist' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'wishlist'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <Heart className="w-5 h-5" />
-                قائمة المنتجات المفضلة
+                <Heart className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>قائمة المنتجات المفضلة</span>
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{wishlist.length}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'wishlist'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {wishlist.length}
+              </span>
             </button>
 
             <button
               onClick={() => { setActiveTab('orders'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'orders' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'orders'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <ShoppingBag className="w-5 h-5" />
-                سجل الطلبات وتتبع الشحنات
+                <Package className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>سجل الطلبات وتتبع الشحنات</span>
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{orders.length}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'orders'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {orders.length}
+              </span>
             </button>
 
             <button
               onClick={() => { setActiveTab('returns'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'returns' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'returns'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <RotateCcw className="w-5 h-5 text-amber-600 dark:text-amber-400" />
-                طلبات إرجاع المنتجات
+                <RotateCcw className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>طلبات إرجاع المنتجات</span>
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{customerReturns.length}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'returns'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {customerReturns.length}
+              </span>
             </button>
 
             <button
               onClick={() => { setActiveTab('notifications'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'notifications' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'notifications'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <Bell className="w-5 h-5" />
-                مركز التنبيهات والإشعارات
+                <Bell className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>مركز التنبيهات والإشعارات</span>
               </span>
               {notifications.filter(n => !n.isRead).length > 0 && (
                 <span className="text-xs px-2 py-0.5 rounded-full bg-red-500 text-white font-black">
@@ -1282,21 +1330,35 @@ export default function CustomerAccountSystem({
 
             <button
               onClick={() => { setActiveTab('reviews'); clearError(); }}
-              className={`w-full flex items-center justify-between p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'reviews' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center justify-between px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'reviews'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
               <span className="flex items-center gap-3">
-                <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                ⭐ تقييماتي
+                <Star className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+                <span>تقييماتي وآرائي</span>
               </span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">{myReviews.length}</span>
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === 'reviews'
+                  ? 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+              }`}>
+                {myReviews.length}
+              </span>
             </button>
 
             <button
               onClick={() => { setActiveTab('security'); clearError(); }}
-              className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${activeTab === 'security' ? 'bg-amber-500 text-slate-950 shadow-sm' : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50'}`}
+              className={`w-full flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all font-bold text-sm cursor-pointer ${
+                activeTab === 'security'
+                  ? 'bg-amber-500/10 text-amber-500 dark:text-amber-400 font-extrabold'
+                  : 'text-slate-400 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800/50'
+              }`}
             >
-              <Shield className="w-5 h-5" />
-              أمان وحماية الحساب الشخصي
+              <ShieldCheck className="w-5 h-5 shrink-0" strokeWidth={1.75} />
+              <span>أمان وحماية الحساب الشخصي</span>
             </button>
           </div>
         </div>
@@ -1997,16 +2059,16 @@ export default function CustomerAccountSystem({
               ) : (
                 <div className="space-y-4">
                   {customerReturns.map((ret) => {
-                    const statusBadgeMap: Record<string, { label: string; color: string }> = {
-                      pending: { label: 'قيد المراجعة', color: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800' },
-                      approved: { label: 'تمت الموافقة', color: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800' },
-                      pickup_pending: { label: 'قيد ترتيب الاستلام', color: 'bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-800' },
-                      received: { label: 'تم الاستلام بالفحص', color: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800' },
-                      completed: { label: 'مكتمل ومسترد', color: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800' },
-                      rejected: { label: 'مرفوض', color: 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800' },
-                      cancelled: { label: 'ملغى من قبلك', color: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700' }
+                    const statusBadgeMap: Record<string, { label: string; color: string; dot: string }> = {
+                      pending: { label: 'قيد المراجعة', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', dot: 'bg-amber-400' },
+                      approved: { label: 'تمت الموافقة', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', dot: 'bg-emerald-400' },
+                      pickup_pending: { label: 'قيد ترتيب الاستلام', color: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20', dot: 'bg-amber-400' },
+                      received: { label: 'تم الاستلام بالفحص', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', dot: 'bg-emerald-400' },
+                      completed: { label: 'مكتمل ومسترد', color: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20', dot: 'bg-emerald-400' },
+                      rejected: { label: 'مرفوض', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20', dot: 'bg-rose-400' },
+                      cancelled: { label: 'ملغى من قبلك', color: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20', dot: 'bg-rose-400' }
                     };
-                    const badge = statusBadgeMap[ret.status] || { label: ret.status, color: 'bg-slate-100 text-slate-700' };
+                    const badge = statusBadgeMap[ret.status] || { label: ret.status, color: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/20', dot: 'bg-slate-400' };
 
                     return (
                       <div
@@ -2019,7 +2081,8 @@ export default function CustomerAccountSystem({
                             <span className="text-slate-500 dark:text-slate-400 font-bold">الفاتورة الأصلي: <strong className="text-amber-600 dark:text-amber-400">{ret.orderInvoiceNumber}</strong></span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border ${badge.color}`}>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap ${badge.color}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${badge.dot} shrink-0`} />
                               {badge.label}
                             </span>
                             <span className="text-[11px] text-slate-400 dark:text-slate-500 font-bold">

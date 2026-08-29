@@ -354,33 +354,44 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
   }, [selectedAdjustProduct, selectedAdjustVariant]);
 
   const isDeductionType = adjustType === 'out_adjustment' || adjustType === 'out_damaged';
+  const isDirectManualType = adjustType === 'manual_adjustment';
 
   const projectedNewStock = useMemo(() => {
     const qty = Number(adjustQuantity) || 0;
+    if (isDirectManualType) {
+      return qty; // adjustQuantity represents new target stock in direct manual mode
+    }
     if (isDeductionType) {
       return currentStockForAdjustment - qty;
     } else {
       return currentStockForAdjustment + qty;
     }
-  }, [currentStockForAdjustment, adjustQuantity, isDeductionType]);
+  }, [currentStockForAdjustment, adjustQuantity, isDeductionType, isDirectManualType]);
 
   const openAdjustModal = (productId?: string, variantId?: string) => {
+    let initialStock = 0;
     if (productId) {
       setAdjustProductId(productId);
       const prod = products.find(p => p.id === productId);
       if (variantId) {
         setAdjustVariantId(variantId);
+        const v = prod?.variants?.find(v => v.id === variantId);
+        initialStock = v?.stock || 0;
       } else if (prod?.variants && prod.variants.length > 0) {
         setAdjustVariantId(prod.variants[0].id);
+        initialStock = prod.variants[0].stock || 0;
       } else {
         setAdjustVariantId('');
+        initialStock = prod?.stock || 0;
       }
     } else if (products.length > 0) {
       setAdjustProductId(products[0].id);
       if (products[0].variants && products[0].variants.length > 0) {
         setAdjustVariantId(products[0].variants[0].id);
+        initialStock = products[0].variants[0].stock || 0;
       } else {
         setAdjustVariantId('');
+        initialStock = products[0].stock || 0;
       }
     }
     setAdjustType('in_purchase');
@@ -400,13 +411,14 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
       return;
     }
 
-    const qtyVal = validateNumericValue(adjustQuantity, 'positive_integer', {
+    const qtyValType = isDirectManualType ? 'non_negative_integer' : 'positive_integer';
+    const qtyVal = validateNumericValue(adjustQuantity, qtyValType, {
       required: true,
-      min: 1,
-      fieldNameArabic: 'كمية الجرد'
+      min: 0,
+      fieldNameArabic: isDirectManualType ? 'الرصيد الفعلي الجديد' : 'كمية الجرد'
     });
     if (!qtyVal.valid) {
-      showError(qtyVal.error || 'يرجى إدخال كمية صحيحة أكبر من صفر');
+      showError(qtyVal.error || 'يرجى إدخال قيمة صحيحة');
       return;
     }
 
@@ -415,22 +427,44 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
       return;
     }
 
-    // Require confirmation before deduction
-    if (isDeductionType && !adjustConfirmOpen) {
+    const calculatedDelta = isDirectManualType 
+      ? qtyVal.value! - currentStockForAdjustment 
+      : (isDeductionType ? -qtyVal.value! : qtyVal.value!);
+
+    if (isDirectManualType && calculatedDelta === 0) {
+      showError('الرصيد الجديد مطابق للرصيد الحالي، لم يتم إجراء أي تغيير');
+      return;
+    }
+
+    // Require confirmation before deduction or direct manual reduction
+    const isDecreasing = calculatedDelta < 0;
+    if (isDecreasing && !adjustConfirmOpen) {
       setAdjustConfirmOpen(true);
       return;
     }
 
     setSubmittingAdjust(true);
     try {
-      await api.adjustInventoryStock({
-        productId: adjustProductId,
-        variantId: adjustVariantId || undefined,
-        type: adjustType,
-        quantity: qtyVal.value!,
-        reason: adjustReason.trim(),
-        referenceId: adjustReferenceId.trim() || undefined
-      });
+      if (isDirectManualType) {
+        await api.adjustInventoryStock({
+          productId: adjustProductId,
+          variantId: adjustVariantId || undefined,
+          type: 'manual_adjustment',
+          quantity: Math.abs(calculatedDelta),
+          targetStock: qtyVal.value!,
+          reason: adjustReason.trim(),
+          referenceId: adjustReferenceId.trim() || undefined
+        });
+      } else {
+        await api.adjustInventoryStock({
+          productId: adjustProductId,
+          variantId: adjustVariantId || undefined,
+          type: adjustType,
+          quantity: qtyVal.value!,
+          reason: adjustReason.trim(),
+          referenceId: adjustReferenceId.trim() || undefined
+        });
+      }
 
       showSuccess('تمت عملية تعديل المخزون وتسجيل حركة الجرد بنجاح! 📦');
       setIsAdjustModalOpen(false);
@@ -1141,9 +1175,9 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className="p-3.5 font-mono text-slate-700 dark:text-slate-300">
-                            <span>{m.previousStock}</span>
-                            <span className="text-slate-400 dark:text-slate-500 mx-1">←</span>
-                            <strong className="text-slate-900 dark:text-white">{m.newStock}</strong>
+                            <span className="text-slate-500 dark:text-slate-400">{m.previousStock}</span>
+                            <span className="text-slate-400 dark:text-slate-500 mx-1">→</span>
+                            <strong className="text-slate-900 dark:text-white font-bold">{m.newStock}</strong>
                           </td>
 
                           <td className="p-3.5 text-slate-600 dark:text-slate-300 max-w-xs truncate">
@@ -1151,7 +1185,7 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                           </td>
 
                           <td className="p-3.5 font-mono text-slate-500 dark:text-slate-400 text-[11px]">
-                            {m.referenceId || '--'}
+                            {m.reference || m.referenceId || '--'}
                           </td>
 
                           <td className="p-3.5 text-slate-500 dark:text-slate-400 text-[11px]">
@@ -1382,37 +1416,60 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
               {/* Adjustment Type Selector */}
               <div className="flex flex-col gap-1.5">
                 <label className="font-bold text-slate-700 dark:text-slate-300">نوع الحركة والجرد <span className="text-rose-500">*</span></label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <button
                     type="button"
-                    onClick={() => setAdjustType('in_purchase')}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${adjustType === 'in_purchase' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-400' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                    onClick={() => {
+                      setAdjustType('in_purchase');
+                      setAdjustQuantity(1);
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${adjustType === 'in_purchase' ? 'bg-emerald-500/20 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    إدخال مخزون (شراء/توريد)
+                    توريد / شراء جديد (+)
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setAdjustType('in_adjustment')}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${adjustType === 'in_adjustment' ? 'bg-teal-500/20 border-teal-500 text-teal-700 dark:text-teal-400' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                    onClick={() => {
+                      setAdjustType('in_adjustment');
+                      setAdjustQuantity(1);
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${adjustType === 'in_adjustment' ? 'bg-teal-500/20 border-teal-500 text-teal-700 dark:text-teal-400 font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    تعديل جردي (+ إيجاب)
+                    تسوية جردية (+ إيجاب)
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setAdjustType('out_adjustment')}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${adjustType === 'out_adjustment' ? 'bg-rose-500/20 border-rose-500 text-rose-700 dark:text-rose-400' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                    onClick={() => {
+                      setAdjustType('out_adjustment');
+                      setAdjustQuantity(1);
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${adjustType === 'out_adjustment' ? 'bg-rose-500/20 border-rose-500 text-rose-700 dark:text-rose-400 font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    تعديل جردي (- سلب)
+                    تسوية جردية (- سلب)
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => setAdjustType('out_damaged')}
-                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer ${adjustType === 'out_damaged' ? 'bg-red-600/20 border-red-500 text-red-700 dark:text-red-400' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                    onClick={() => {
+                      setAdjustType('out_damaged');
+                      setAdjustQuantity(1);
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs ${adjustType === 'out_damaged' ? 'bg-red-600/20 border-red-500 text-red-700 dark:text-red-400 font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
                   >
-                    تالف / مفقود
+                    تالف / مفقود (- سلب)
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAdjustType('manual_adjustment');
+                      setAdjustQuantity(currentStockForAdjustment);
+                    }}
+                    className={`p-2.5 rounded-xl border text-center font-bold transition-all cursor-pointer text-xs col-span-2 sm:col-span-2 ${adjustType === 'manual_adjustment' ? 'bg-amber-500/20 border-amber-500 text-amber-800 dark:text-amber-300 font-black' : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}`}
+                  >
+                    تعديل يدوي مباشر (تحديد الرصيد الفعلي الجديد)
                   </button>
                 </div>
               </div>
@@ -1420,15 +1477,18 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
               {/* Quantity Input & Projected stock preview */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-bold text-slate-700 dark:text-slate-300">الكمية <span className="text-rose-500">*</span></label>
+                  <label className="font-bold text-slate-700 dark:text-slate-300">
+                    {isDirectManualType ? 'الرصيد الفعلي بعد الجرد' : 'الكمية المطلوبة'}{' '}
+                    <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
                     inputMode="numeric"
                     value={adjustQuantity !== undefined ? adjustQuantity : ''}
-                    onKeyDown={(e) => handleNumericKeyDown(e, 'positive_integer')}
-                    onPaste={(e) => handleNumericPaste(e, 'positive_integer')}
+                    onKeyDown={(e) => handleNumericKeyDown(e, isDirectManualType ? 'non_negative_integer' : 'positive_integer')}
+                    onPaste={(e) => handleNumericPaste(e, isDirectManualType ? 'non_negative_integer' : 'positive_integer')}
                     onChange={(e) => {
-                      const clean = sanitizeNumericInput(e.target.value, 'positive_integer');
+                      const clean = sanitizeNumericInput(e.target.value, isDirectManualType ? 'non_negative_integer' : 'positive_integer');
                       setAdjustQuantity(clean === '' ? ('' as any) : Number(clean));
                     }}
                     className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-slate-900 dark:text-white font-mono focus:outline-none focus:border-amber-500 text-center font-bold shadow-sm"
@@ -1436,13 +1496,26 @@ export default function AdminInventory({ onRefreshAll }: AdminInventoryProps) {
                 </div>
 
                 <div className="flex flex-col gap-1.5 justify-center bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-center shadow-sm">
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold">الرصيد المتوقع بعد الحركة</span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 block font-bold">
+                    {isDirectManualType ? 'فارق الحركة (Delta)' : 'الرصيد المتوقع بعد الحركة'}
+                  </span>
                   <div className="text-base font-black font-mono mt-0.5">
-                    <span className="text-slate-500 dark:text-slate-400">{currentStockForAdjustment}</span>
-                    <span className="text-slate-400 dark:text-slate-500 mx-1">→</span>
-                    <strong className={projectedNewStock < 0 ? 'text-rose-600 dark:text-rose-500 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}>
-                      {projectedNewStock} قطعة
-                    </strong>
+                    {isDirectManualType ? (
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400 text-xs">{currentStockForAdjustment} الحالي → </span>
+                        <strong className={projectedNewStock < currentStockForAdjustment ? 'text-rose-600 dark:text-rose-400' : projectedNewStock > currentStockForAdjustment ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-600'}>
+                          {projectedNewStock - currentStockForAdjustment >= 0 ? `+${projectedNewStock - currentStockForAdjustment}` : `${projectedNewStock - currentStockForAdjustment}`}
+                        </strong>
+                      </div>
+                    ) : (
+                      <div>
+                        <span className="text-slate-500 dark:text-slate-400">{currentStockForAdjustment}</span>
+                        <span className="text-slate-400 dark:text-slate-500 mx-1">→</span>
+                        <strong className={projectedNewStock < 0 ? 'text-rose-600 dark:text-rose-500 animate-pulse' : 'text-emerald-600 dark:text-emerald-400'}>
+                          {projectedNewStock} قطعة
+                        </strong>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

@@ -16,6 +16,7 @@ export interface Campaign {
 
 export interface ProductVariant {
   id: string;
+  image?: string;
   color?: string;
   size?: string;
   capacity?: string; // e.g., "500 Liters", "12 kg"
@@ -59,12 +60,14 @@ export interface StockMovement {
   quantityDelta: number;
   previousStock: number;
   newStock: number;
+  reference?: string;
   referenceId?: string;
   referenceType?: string;
   reason?: string;
   note?: string;
   performedBy?: string;
   performedByName?: string;
+  adminName?: string;
   adminId?: string;
   createdBy?: string;
   createdAt: string;
@@ -75,7 +78,9 @@ export interface AdjustStockParams {
   productId: string;
   variantId?: string;
   type: StockMovementType;
-  quantity: number;
+  quantity?: number;
+  targetStock?: number;
+  reference?: string;
   referenceId?: string;
   referenceType?: string;
   reason?: string;
@@ -395,9 +400,6 @@ export interface SystemSettings {
   contactPhone: string;
   contactEmail: string;
   contactAddress: string;
-  socialFacebook?: string;
-  socialInstagram?: string;
-  socialTwitter?: string;
   socialLinks?: SocialLink[];
   bannerTitle: string;
   bannerSubtitle: string;

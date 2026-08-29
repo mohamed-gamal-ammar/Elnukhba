@@ -9,14 +9,10 @@ interface FooterProps {
 }
 
 export default function Footer({ settings, onNavigate }: FooterProps) {
-  // Extract active social links
+  // Extract active dynamic social links
   const activeSocialLinks = Array.isArray(settings.socialLinks)
-    ? settings.socialLinks.filter(link => link.enabled !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
-    : [
-        ...(settings.socialFacebook ? [{ id: 'facebook', name: 'Facebook', url: settings.socialFacebook, icon: 'facebook', enabled: true, order: 1, openInNewTab: true }] : []),
-        ...(settings.socialInstagram ? [{ id: 'instagram', name: 'Instagram', url: settings.socialInstagram, icon: 'instagram', enabled: true, order: 2, openInNewTab: true }] : []),
-        ...(settings.socialTwitter ? [{ id: 'twitter', name: 'Twitter', url: settings.socialTwitter, icon: 'twitter', enabled: true, order: 3, openInNewTab: true }] : [])
-      ];
+    ? settings.socialLinks.filter(link => link.enabled !== false && link.url).sort((a, b) => (a.order || 0) - (b.order || 0))
+    : [];
   return (
     <footer className="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-white pt-12 pb-6 border-t border-slate-200 dark:border-slate-800 transition-colors" id="site-footer">
       {/* Visual core values icons row */}

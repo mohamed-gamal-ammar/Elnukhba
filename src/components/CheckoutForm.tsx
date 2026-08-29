@@ -124,10 +124,11 @@ export default function CheckoutForm({
       effectiveCouponDiscount = 0;
     } else if (activeCoupon.discountType === 'percentage') {
       let d = (cartSubtotal * rawVal) / 100;
-      if (activeCoupon.maxDiscountAmount && d > activeCoupon.maxDiscountAmount) {
+      if (activeCoupon.maxDiscountAmount && activeCoupon.maxDiscountAmount > 0 && d > activeCoupon.maxDiscountAmount) {
         d = activeCoupon.maxDiscountAmount;
       }
-      effectiveCouponDiscount = Math.round(d);
+      d = Math.min(d, cartSubtotal);
+      effectiveCouponDiscount = Number(d.toFixed(2));
     } else if (activeCoupon.discountType === 'fixed') {
       effectiveCouponDiscount = Math.min(rawVal, cartSubtotal);
     } else if (activeCoupon.discountType === 'free_shipping') {

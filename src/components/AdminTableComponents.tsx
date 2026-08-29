@@ -120,6 +120,7 @@ export interface AdminTablePaginationProps {
   onPageChange: (newPage: number) => void;
   onLimitChange?: (newLimit: number) => void;
   className?: string;
+  limitOptions?: number[];
 }
 
 export const AdminTablePagination: React.FC<AdminTablePaginationProps> = React.memo(({
@@ -129,7 +130,8 @@ export const AdminTablePagination: React.FC<AdminTablePaginationProps> = React.m
   limit,
   onPageChange,
   onLimitChange,
-  className = ''
+  className = '',
+  limitOptions = [10, 15, 25, 50]
 }) => {
   if (total <= 0) return null;
 
@@ -138,28 +140,27 @@ export const AdminTablePagination: React.FC<AdminTablePaginationProps> = React.m
 
   return (
     <div className={`mt-4 pt-3 border-t border-slate-200 dark:border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-600 dark:text-slate-400 ${className}`}>
-      <div>
+      <div className="select-none">
         عرض <strong className="text-slate-900 dark:text-white">{startItem}–{endItem}</strong> من إجمالي <strong className="text-amber-600 dark:text-amber-400">{total}</strong> (صفحة <strong className="text-slate-900 dark:text-white">{page}</strong> من <strong className="text-slate-900 dark:text-white">{totalPages || 1}</strong>)
       </div>
 
       <div className="flex items-center gap-2">
         {onLimitChange && (
           <div className="flex items-center gap-1.5 min-w-[110px]">
-            <span className="text-[11px] shrink-0">عدد العناصر:</span>
-            <CustomSelect
-              value={limit}
-              onChange={(val) => onLimitChange(Number(val))}
-              size="sm"
-              placement="top"
-              buttonClassName="bg-white dark:bg-slate-900 border-slate-300 dark:border-amber-500/20 text-slate-900 dark:text-white rounded-lg px-2 py-0.5 text-xs font-bold"
-              menuClassName="bg-white dark:bg-slate-900 min-w-[70px] shadow-xl"
-              options={[
-                { value: '10', label: '10' },
-                { value: '15', label: '15' },
-                { value: '25', label: '25' },
-                { value: '50', label: '50' }
-              ]}
-            />
+            <span className="text-[11px] shrink-0 font-medium">عدد العناصر:</span>
+            <div className="w-20">
+              <CustomSelect
+                value={limit}
+                onChange={(val) => onLimitChange(Number(val))}
+                size="sm"
+                placement="top"
+                align="start"
+                searchable={false}
+                buttonClassName="bg-white dark:bg-slate-900 border-slate-300 dark:border-amber-500/20 text-slate-900 dark:text-white rounded-lg px-2.5 py-1 text-xs font-bold shadow-xs hover:border-amber-500/40"
+                menuClassName="bg-white dark:bg-slate-900 min-w-[80px] shadow-2xl border-slate-200 dark:border-amber-500/30"
+                options={limitOptions.map(opt => ({ value: String(opt), label: String(opt) }))}
+              />
+            </div>
           </div>
         )}
 

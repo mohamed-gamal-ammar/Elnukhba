@@ -600,7 +600,11 @@ export default function AdminMediaLibrary({
       const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000;
       if (itemTime < oneDayAgo) return false;
     } else if (activeFolder !== 'all') {
-      if ((item.folder || '') !== activeFolder) return false;
+      const activeFolderObj = folderObjects.find(f => f.name === activeFolder || f.id === activeFolder);
+      const isMatch = (item.folder || '') === activeFolder || 
+                      (activeFolderObj && item.folderId === activeFolderObj.id) ||
+                      (item.folderId === activeFolder);
+      if (!isMatch) return false;
     }
 
     // 3. MIME Type Match

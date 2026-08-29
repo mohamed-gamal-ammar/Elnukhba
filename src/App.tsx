@@ -1155,19 +1155,22 @@ export default function App() {
 
       if (res && (res as any).valid !== false) {
         setActiveCoupon(res);
-        let discount = 0;
-        const rawVal = res.value !== undefined ? res.value : (res.discountValue !== undefined ? res.discountValue : 0);
-        if (res.discountType === 'percentage') {
-          discount = (cartTotal * rawVal) / 100;
-          if (res.maxDiscountAmount && discount > res.maxDiscountAmount) {
-            discount = res.maxDiscountAmount;
+        let discount = typeof res.discountAmount === 'number' ? res.discountAmount : 0;
+        if (discount === 0 && res.discountType) {
+          const rawVal = res.value !== undefined ? res.value : (res.discountValue !== undefined ? res.discountValue : 0);
+          if (res.discountType === 'percentage') {
+            discount = (cartTotal * rawVal) / 100;
+            if (res.maxDiscountAmount && res.maxDiscountAmount > 0 && discount > res.maxDiscountAmount) {
+              discount = res.maxDiscountAmount;
+            }
+            discount = Math.min(discount, cartTotal);
+          } else if (res.discountType === 'fixed') {
+            discount = Math.min(rawVal, cartTotal);
+          } else if (res.discountType === 'free_shipping') {
+            discount = settings?.shippingFlatRate || 0;
           }
-          discount = Math.round(discount);
-        } else if (res.discountType === 'fixed') {
-          discount = Math.min(rawVal, cartTotal);
-        } else if (res.discountType === 'free_shipping') {
-          discount = settings?.shippingFlatRate || 0;
         }
+        discount = Number(discount.toFixed(2));
         setCouponDiscount(discount);
         setCouponError('');
       } else {
@@ -1177,7 +1180,7 @@ export default function App() {
         setActiveCoupon(null);
       }
     } catch (err: any) {
-      const errMsg = err?.data?.message || err?.data?.error || getFriendlyErrorMessage(err, 'الكوبون المدخل غير صالح أو انتهت صلاحيته');
+      const errMsg = err?.data?.error || err?.data?.message || getFriendlyErrorMessage(err, 'الكوبون المدخل غير صالح أو انتهت صلاحيته');
       setCouponError(errMsg);
       setCouponDiscount(0);
       setActiveCoupon(null);
@@ -1218,16 +1221,17 @@ export default function App() {
     const rawVal = activeCoupon.value !== undefined ? activeCoupon.value : (activeCoupon.discountValue !== undefined ? activeCoupon.discountValue : 0);
     if (activeCoupon.discountType === 'percentage') {
       discount = (cartTotal * rawVal) / 100;
-      if (activeCoupon.maxDiscountAmount && discount > activeCoupon.maxDiscountAmount) {
+      if (activeCoupon.maxDiscountAmount && activeCoupon.maxDiscountAmount > 0 && discount > activeCoupon.maxDiscountAmount) {
         discount = activeCoupon.maxDiscountAmount;
       }
-      discount = Math.round(discount);
+      discount = Math.min(discount, cartTotal);
     } else if (activeCoupon.discountType === 'fixed') {
       discount = Math.min(rawVal, cartTotal);
     } else if (activeCoupon.discountType === 'free_shipping') {
       discount = settings?.shippingFlatRate || 0;
     }
 
+    discount = Number(discount.toFixed(2));
     setCouponDiscount(discount);
   }, [cart, activeCoupon, settings?.shippingFlatRate]);
 
@@ -3252,12 +3256,8 @@ export default function App() {
                 {/* Dynamic Social Media Channels Section */}
                 {(() => {
                   const activeSocial = Array.isArray(settings.socialLinks)
-                    ? settings.socialLinks.filter(l => l.enabled !== false).sort((a, b) => (a.order || 0) - (b.order || 0))
-                    : [
-                        ...(settings.socialFacebook ? [{ id: 'facebook', name: 'Facebook', url: settings.socialFacebook, icon: 'facebook', enabled: true, order: 1, openInNewTab: true }] : []),
-                        ...(settings.socialInstagram ? [{ id: 'instagram', name: 'Instagram', url: settings.socialInstagram, icon: 'instagram', enabled: true, order: 2, openInNewTab: true }] : []),
-                        ...(settings.socialTwitter ? [{ id: 'twitter', name: 'Twitter', url: settings.socialTwitter, icon: 'twitter', enabled: true, order: 3, openInNewTab: true }] : [])
-                      ];
+                    ? settings.socialLinks.filter(l => l.enabled !== false && l.url).sort((a, b) => (a.order || 0) - (b.order || 0))
+                    : [];
 
                   if (activeSocial.length === 0) return null;
 

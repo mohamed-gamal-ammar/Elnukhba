@@ -218,36 +218,88 @@ export default function AdminReturns({ onRefreshAll }: AdminReturnsProps) {
   const getStatusBadge = (status: ReturnStatus) => {
     switch (status) {
       case 'pending':
-        return { label: 'بانتظار المراجعة', class: 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800' };
-      case 'approved':
-        return { label: 'تمت الموافقة', class: 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-300 dark:border-blue-800' };
+        return {
+          label: 'بانتظار المراجعة',
+          class: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+          dotClass: 'bg-amber-400'
+        };
       case 'pickup_pending':
-        return { label: 'قيد ترتيب الاستلام', class: 'bg-sky-100 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-300 dark:border-sky-800' };
+        return {
+          label: 'قيد ترتيب الاستلام',
+          class: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+          dotClass: 'bg-amber-400'
+        };
+      case 'approved':
+        return {
+          label: 'تمت الموافقة',
+          class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+          dotClass: 'bg-emerald-400'
+        };
       case 'received':
-        return { label: 'تم استلام الشحنة بالمخزن', class: 'bg-purple-100 dark:bg-purple-950/60 text-purple-800 dark:text-purple-300 border-purple-300 dark:border-purple-800' };
+        return {
+          label: 'تم استلام الشحنة بالمخزن',
+          class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+          dotClass: 'bg-emerald-400'
+        };
       case 'completed':
-        return { label: 'مكتمل ومسترد بالمخزن', class: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800' };
+        return {
+          label: 'مكتمل ومسترد بالمخزن',
+          class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+          dotClass: 'bg-emerald-400'
+        };
       case 'rejected':
-        return { label: 'مرفوض', class: 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-300 dark:border-rose-800' };
+        return {
+          label: 'مرفوض',
+          class: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+          dotClass: 'bg-rose-400'
+        };
       case 'cancelled':
-        return { label: 'ملغى من العميل', class: 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700' };
+        return {
+          label: 'ملغى من العميل',
+          class: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+          dotClass: 'bg-rose-400'
+        };
       default:
-        return { label: status, class: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700' };
+        return {
+          label: status,
+          class: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20',
+          dotClass: 'bg-slate-400'
+        };
     }
   };
 
   const getRefundBadge = (status: RefundStatus) => {
     switch (status) {
       case 'pending':
-        return { label: 'استرداد معلق', class: 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border-amber-300' };
+        return {
+          label: 'استرداد معلق',
+          class: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20',
+          dotClass: 'bg-amber-400'
+        };
       case 'approved':
-        return { label: 'موافقة على الاسترداد', class: 'bg-blue-100 dark:bg-blue-950/50 text-blue-800 dark:text-blue-300 border-blue-300' };
+        return {
+          label: 'موافقة على الاسترداد',
+          class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+          dotClass: 'bg-emerald-400'
+        };
       case 'processed':
-        return { label: 'تم تحويل المبلغ', class: 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-300' };
+        return {
+          label: 'تم تحويل المبلغ',
+          class: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20',
+          dotClass: 'bg-emerald-400'
+        };
       case 'rejected':
-        return { label: 'استرداد مرفوض', class: 'bg-rose-100 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-300' };
+        return {
+          label: 'استرداد مرفوض',
+          class: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20',
+          dotClass: 'bg-rose-400'
+        };
       default:
-        return { label: status, class: 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300' };
+        return {
+          label: status,
+          class: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20',
+          dotClass: 'bg-slate-400'
+        };
     }
   };
 
@@ -552,14 +604,16 @@ export default function AdminReturns({ onRefreshAll }: AdminReturnsProps) {
 
                       {/* Return Status */}
                       <td className="p-3.5">
-                        <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-extrabold border ${statusBadge.class}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap ${statusBadge.class}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${statusBadge.dotClass} shrink-0`} />
                           {statusBadge.label}
                         </span>
                       </td>
 
                       {/* Refund Status */}
                       <td className="p-3.5">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${refundBadge.class}`}>
+                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap ${refundBadge.class}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${refundBadge.dotClass} shrink-0`} />
                           {refundBadge.label}
                         </span>
                       </td>
@@ -667,7 +721,8 @@ export default function AdminReturns({ onRefreshAll }: AdminReturnsProps) {
                 <div>
                   <h3 className="font-black text-slate-900 dark:text-white text-base flex items-center gap-2">
                     <span>مراجعة وإدارة طلب الإرجاع #{selectedReturn.id}</span>
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-extrabold border ${getStatusBadge(selectedReturn.status).class}`}>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border whitespace-nowrap ${getStatusBadge(selectedReturn.status).class}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${getStatusBadge(selectedReturn.status).dotClass} shrink-0`} />
                       {getStatusBadge(selectedReturn.status).label}
                     </span>
                   </h3>
