@@ -8,15 +8,26 @@ export interface AuthenticatedRequest extends Request {
   adminId?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback-secure-secret-key-change-in-production';
+const isProduction = process.env.NODE_ENV === 'production';
+const configuredJwtSecret = process.env.JWT_SECRET?.trim();
+
+if (isProduction && !configuredJwtSecret) {
+  throw new Error('JWT_SECRET is required in production. Set JWT_SECRET before starting the server.');
+}
+
+// Development/Test fallback only. Never used when NODE_ENV=production.
+const DEVELOPMENT_TEST_JWT_SECRET = 'development-test-only-jwt-secret';
+const JWT_SECRET = configuredJwtSecret || (!isProduction
+  ? process.env.SESSION_SECRET?.trim() || DEVELOPMENT_TEST_JWT_SECRET
+  : '');
 
 /**
  * Middleware to authenticate requests using JWT tokens (HS256)
  */
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.startsWith('Bearer ') 
-    ? authHeader.split(' ')[1] 
+  const token = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
     : (typeof authHeader === 'string' ? authHeader : undefined);
 
   if (!token) {
