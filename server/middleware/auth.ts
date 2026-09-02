@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '../jwt-config.js';
 
 // Extend Express Request interface locally
 export interface AuthenticatedRequest extends Request {
@@ -8,15 +9,13 @@ export interface AuthenticatedRequest extends Request {
   adminId?: string;
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'fallback-secure-secret-key-change-in-production';
-
 /**
  * Middleware to authenticate requests using JWT tokens (HS256)
  */
 export function authenticateToken(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.startsWith('Bearer ') 
-    ? authHeader.split(' ')[1] 
+  const token = authHeader && authHeader.startsWith('Bearer ')
+    ? authHeader.split(' ')[1]
     : (typeof authHeader === 'string' ? authHeader : undefined);
 
   if (!token) {
