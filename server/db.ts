@@ -1292,18 +1292,42 @@ export function initDb(): DatabaseSchema {
   try {
     const content = fs.readFileSync(DB_FILE, 'utf-8');
     let parsed: DatabaseSchema;
+    let modified = false;
     try {
       parsed = JSON.parse(content) as DatabaseSchema;
     } catch (parseErr) {
-      // Attempt to sanitize unescaped control characters (except standard newlines and tabs)
+      console.warn('Direct JSON.parse failed on db.json, attempting resilient recovery...', parseErr);
       try {
         const cleaned = content.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
         parsed = JSON.parse(cleaned) as DatabaseSchema;
-      } catch {
-        throw parseErr;
+        modified = true;
+      } catch (cleanErr) {
+        // Step 2: Attempt structural recovery if file has trailing corruption
+        let recovered: DatabaseSchema | null = null;
+        for (let i = content.length - 1; i > 0; i--) {
+          if (content[i] === '}' || content[i] === ']') {
+            const sub = content.slice(0, i + 1).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+            for (const suffix of ['', '}', ']}', '\n  ]\n}\n', '\n}\n']) {
+              try {
+                const testParsed = JSON.parse(sub + suffix);
+                if (testParsed && typeof testParsed === 'object' && (testParsed.products || testParsed.orders || testParsed.settings)) {
+                  recovered = testParsed as DatabaseSchema;
+                  break;
+                }
+              } catch {}
+            }
+            if (recovered) break;
+          }
+        }
+        if (recovered) {
+          parsed = recovered;
+          modified = true;
+          console.warn('Resilient recovery successfully restored database from corrupted structure.');
+        } else {
+          throw parseErr;
+        }
       }
     }
-    let modified = false;
     if (!parsed.admin) {
       parsed.admin = {
         email: defaultAdmin.email,
